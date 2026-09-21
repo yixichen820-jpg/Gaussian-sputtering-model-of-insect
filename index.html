@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>昆虫高斯溅射模型展示</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23090b0f'/><path d='M8 17l5 5 11-12' fill='none' stroke='%237dd3a8' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>" />
+    <link rel="stylesheet" href="/style.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "/node_modules/three/build/three.module.js",
+          "@mkkellogg/gaussian-splats-3d": "/node_modules/@mkkellogg/gaussian-splats-3d/build/gaussian-splats-3d.module.js",
+          "lucide": "/node_modules/lucide/dist/esm/lucide.mjs"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="stage" id="stage" aria-label="高斯溅射模型查看器"></section>
+
+      <header class="topbar">
+        <div class="brand-block">
+          <div class="brand-mark" aria-hidden="true">
+            <i data-lucide="scan"></i>
+          </div>
+          <div>
+            <p class="eyebrow">Gaussian Splat Viewer</p>
+            <h1>昆虫高斯溅射模型展示</h1>
+          </div>
+        </div>
+
+        <div class="model-switcher" id="model-switcher" role="tablist" aria-label="模型切换"></div>
+
+        <div class="toolbar" aria-label="视图工具">
+          <button class="icon-button" id="auto-rotate" type="button" aria-label="自动环绕" aria-pressed="false">
+            <i data-lucide="rotate-cw"></i>
+          </button>
+          <button class="icon-button" id="reset-view" type="button" aria-label="复位视角">
+            <i data-lucide="scan"></i>
+          </button>
+          <button class="icon-button" id="fullscreen" type="button" aria-label="全屏">
+            <i data-lucide="maximize"></i>
+          </button>
+          <a class="icon-button" id="admin-link" href="/admin.html" aria-label="模型管理">
+            <i data-lucide="settings-2"></i>
+          </a>
+        </div>
+      </header>
+
+      <aside class="info-panel">
+        <div class="info-heading">
+          <span class="status-dot" id="status-dot"></span>
+          <span id="status-text">准备加载</span>
+        </div>
+        <div class="info-meta">
+          <div>
+            <span class="meta-label">模型</span>
+            <strong id="model-name">原视频</strong>
+          </div>
+          <div>
+            <span class="meta-label">高斯点</span>
+            <strong id="splat-count">460,668</strong>
+          </div>
+        </div>
+      </aside>
+
+      <div class="progress-track" id="progress-track" aria-hidden="true">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </main>
+
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

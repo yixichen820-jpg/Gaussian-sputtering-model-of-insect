@@ -1,0 +1,17 @@
+{
+  "name": "insect-gaussian-splat-viewer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Two PLY Gaussian splat model showcase viewer.",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@mkkellogg/gaussian-splats-3d": "^0.4.7",
+    "busboy": "^1.6.0",
+    "lucide": "^1.47.0",
+    "three": "^0.186.0"
+  }
+}

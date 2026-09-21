@@ -1,0 +1,4 @@
+node_modules/
+*.zip
+/*.ply
+/MAY-BEETLE-HIRES*/
