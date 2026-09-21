@@ -129,6 +129,7 @@ function createViewer() {
   const model = models[activeIndex];
   const frame = getCameraFrame(model);
   const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth < 768;
+  const canUseSharedMemory = window.isSecureContext && window.crossOriginIsolated;
 
   viewer = new GaussianSplats3D.Viewer({
     rootElement: stage,
@@ -137,8 +138,8 @@ function createViewer() {
     initialCameraLookAt: frame.target.toArray(),
     useBuiltInControls: true,
     selfDrivenMode: true,
-    sharedMemoryForWorkers: true,
-    gpuAcceleratedSort: !isMobile,
+    sharedMemoryForWorkers: canUseSharedMemory,
+    gpuAcceleratedSort: canUseSharedMemory && !isMobile,
     integerBasedSort: true,
     enableSIMDInSort: true,
     splatSortDistanceMapPrecision: 20,
