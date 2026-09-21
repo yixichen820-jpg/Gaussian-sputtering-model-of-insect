@@ -128,6 +128,7 @@ function waitForViewerIdle() {
 function createViewer() {
   const model = models[activeIndex];
   const frame = getCameraFrame(model);
+  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth < 768;
 
   viewer = new GaussianSplats3D.Viewer({
     rootElement: stage,
@@ -136,16 +137,18 @@ function createViewer() {
     initialCameraLookAt: frame.target.toArray(),
     useBuiltInControls: true,
     selfDrivenMode: true,
-    sharedMemoryForWorkers: false,
-    gpuAcceleratedSort: false,
-    integerBasedSort: false,
+    sharedMemoryForWorkers: true,
+    gpuAcceleratedSort: !isMobile,
+    integerBasedSort: true,
     enableSIMDInSort: true,
     splatSortDistanceMapPrecision: 20,
     renderMode: GaussianSplats3D.RenderMode.Always,
     sceneRevealMode: GaussianSplats3D.SceneRevealMode.Gradual,
     logLevel: GaussianSplats3D.LogLevel.None,
-    sphericalHarmonicsDegree: 2,
-    optimizeSplatData: false,
+    sphericalHarmonicsDegree: isMobile ? 1 : 2,
+    halfPrecisionCovariancesOnGPU: isMobile,
+    maxScreenSpaceSplatSize: isMobile ? 512 : 1024,
+    optimizeSplatData: true,
     freeIntermediateSplatData: true
   });
 
@@ -172,7 +175,7 @@ async function loadActiveModel() {
     frameCurrentModel();
 
     const loadPromise = viewer.addSplatScene(model.path, {
-      progressiveLoad: true,
+      progressiveLoad: model.splatCount > 100000,
       showLoadingUI: false,
       splatAlphaRemovalThreshold: 5,
       onProgress: (percentComplete, label) => {
@@ -226,7 +229,7 @@ function normalizeModel(rawModel) {
 }
 
 async function loadModels() {
-  const response = await fetch('/api/models');
+  const response = await fetchWithRetry('/api/models');
   if (!response.ok) {
     throw new Error('无法读取模型列表。');
   }
@@ -238,6 +241,27 @@ async function loadModels() {
     return model.id === requestedModel || model.name === requestedModel || String(index + 1) === requestedModel;
   });
   activeIndex = requestedIndex >= 0 ? requestedIndex : 0;
+}
+
+async function fetchWithRetry(url, retries = 3) {
+  let lastError;
+
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      const response = await fetch(url);
+      if (response.status !== 520) return response;
+      lastError = new Error('服务器正在预热，请稍后重试。');
+    } catch (error) {
+      lastError = error;
+    }
+
+    if (attempt < retries - 1) {
+      setStatus(`正在连接服务器 ${attempt + 1}/${retries}`, 'loading');
+      await new Promise((resolve) => window.setTimeout(resolve, 1200 * (attempt + 1)));
+    }
+  }
+
+  throw lastError;
 }
 
 async function initialize() {
