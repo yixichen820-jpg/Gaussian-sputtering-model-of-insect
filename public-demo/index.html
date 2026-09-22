@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>大丽灯蛾 - 高斯溅射展示</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23090b0f'/><path d='M8 17l5 5 11-12' fill='none' stroke='%237dd3a8' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>" />
+    <link rel="stylesheet" href="./style.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.js",
+          "@mkkellogg/gaussian-splats-3d": "https://cdn.jsdelivr.net/npm/@mkkellogg/gaussian-splats-3d@0.4.7/build/gaussian-splats-3d.module.js",
+          "lucide": "https://cdn.jsdelivr.net/npm/lucide@1.47.0/dist/esm/lucide.mjs"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <main class="demo-shell">
+      <section class="stage" id="stage" aria-label="大丽灯蛾高斯溅射模型"></section>
+
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Gaussian Splat Demo</p>
+          <h1>大丽灯蛾</h1>
+        </div>
+        <button class="icon-button" id="auto-rotate" type="button" aria-label="自动环绕" aria-pressed="false">
+          <i data-lucide="rotate-cw"></i>
+        </button>
+      </header>
+
+      <aside class="status-card">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">准备加载</span>
+      </aside>
+
+      <div class="progress-track" id="progress-track" aria-hidden="true">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </main>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

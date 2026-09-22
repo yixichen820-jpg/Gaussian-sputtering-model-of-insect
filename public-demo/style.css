@@ -1,0 +1,160 @@
+:root {
+  color-scheme: dark;
+  --bg: #090b0f;
+  --panel: rgba(12, 16, 22, 0.86);
+  --line: rgba(255, 255, 255, 0.12);
+  --text: #f4f7fb;
+  --muted: #9aa7b5;
+  --accent: #7dd3a8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+
+.demo-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 45%, rgba(50, 68, 82, 0.28), transparent 48%),
+    linear-gradient(180deg, #0b0e13 0%, #090b0f 100%);
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+}
+
+.stage > div {
+  width: 100%;
+  height: 100%;
+}
+
+.stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  outline: none;
+}
+
+.topbar {
+  position: absolute;
+  z-index: 10;
+  top: 22px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 34px);
+  font-weight: 650;
+}
+
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--muted);
+  background: var(--panel);
+  cursor: pointer;
+}
+
+.icon-button[aria-pressed="true"] {
+  color: var(--accent);
+  border-color: rgba(125, 211, 168, 0.5);
+}
+
+.icon-button svg {
+  width: 19px;
+  height: 19px;
+}
+
+.status-card {
+  position: absolute;
+  z-index: 9;
+  left: 24px;
+  bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 15px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--text);
+  background: var(--panel);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e2b46b;
+}
+
+.status-dot.is-ready {
+  background: var(--accent);
+}
+
+.status-dot.is-error {
+  background: #e27a72;
+}
+
+.progress-track {
+  position: absolute;
+  z-index: 11;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.progress-fill {
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #5bbf8a, var(--accent));
+  transition: width 180ms ease;
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    top: 14px;
+    left: 14px;
+    right: 14px;
+  }
+
+  .status-card {
+    left: 14px;
+    bottom: 14px;
+  }
+}
