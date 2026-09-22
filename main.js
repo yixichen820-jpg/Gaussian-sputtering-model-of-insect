@@ -142,6 +142,7 @@ function createViewer() {
     gpuAcceleratedSort: canUseSharedMemory && !isMobile,
     integerBasedSort: true,
     enableSIMDInSort: true,
+    kernel2DSize: isMobile ? 0.7 : 0.55,
     splatSortDistanceMapPrecision: 20,
     renderMode: GaussianSplats3D.RenderMode.Always,
     sceneRevealMode: GaussianSplats3D.SceneRevealMode.Instant,
@@ -178,7 +179,7 @@ async function loadActiveModel() {
     const loadPromise = viewer.addSplatScene(model.path, {
       progressiveLoad: model.splatCount > 100000,
       showLoadingUI: false,
-      splatAlphaRemovalThreshold: 5,
+      splatAlphaRemovalThreshold: 1,
       onProgress: (percentComplete, label) => {
         setProgress(percentComplete);
 
