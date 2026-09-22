@@ -88,7 +88,7 @@ function renderModelSwitcher() {
 
 function getCameraFrame(model) {
   const radius = Math.max(...(model.size || [1, 1, 1])) / 2;
-  const distance = Math.max(radius * 2.35, radius + 18);
+  const distance = Math.max(radius * 1.65, radius + 5);
   const center = model.center || [0, 0, 0];
   const target = new THREE.Vector3(...center);
   const position = new THREE.Vector3(
@@ -144,7 +144,7 @@ function createViewer() {
     enableSIMDInSort: true,
     splatSortDistanceMapPrecision: 20,
     renderMode: GaussianSplats3D.RenderMode.Always,
-    sceneRevealMode: GaussianSplats3D.SceneRevealMode.Gradual,
+    sceneRevealMode: GaussianSplats3D.SceneRevealMode.Instant,
     logLevel: GaussianSplats3D.LogLevel.None,
     sphericalHarmonicsDegree: isMobile ? 1 : 2,
     halfPrecisionCovariancesOnGPU: isMobile,
