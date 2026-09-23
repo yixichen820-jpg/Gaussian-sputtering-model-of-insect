@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>大丽灯蛾 - 独立展示页</title>
+    <link rel="stylesheet" href="/model-viewer.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "/node_modules/three/build/three.module.js",
+          "@mkkellogg/gaussian-splats-3d": "/node_modules/@mkkellogg/gaussian-splats-3d/build/gaussian-splats-3d.module.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <main class="model-page">
+      <section class="model-stage" id="stage"></section>
+      <header class="model-topbar">
+        <p class="model-eyebrow">Gaussian Splat Viewer</p>
+        <h1>大丽灯蛾</h1>
+      </header>
+      <aside class="model-status">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">准备加载</span>
+      </aside>
+    </main>
+    <script type="module" src="/model-viewer.js"></script>
+  </body>
+</html>

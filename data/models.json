@@ -1,9 +1,29 @@
 {
   "models": [
     {
+      "id": "33b83ff1-9035-4300-91d4-5981e97d857c",
+      "name": "大丽灯蛾final",
+      "fileName": "boosted-model-1790093866443-33b83ff1.ply",
+      "originalName": "å¤§ä¸½ç¯è¾final.ply",
+      "fileSize": 3443064,
+      "splatCount": 14583,
+      "center": [
+        0.4039127826690674,
+        2.957986831665039,
+        -2.070513606071472
+      ],
+      "size": [
+        4.565914154052734,
+        7.914432525634766,
+        9.13870644569397
+      ],
+      "createdAt": "2026-09-22T16:17:46.444Z",
+      "updatedAt": "2026-09-22T16:17:51.429Z"
+    },
+    {
       "id": "3fc27a38-758a-4f3b-ae3a-33c9e26e448b",
       "name": "大丽灯蛾",
-      "fileName": "model-1789990620674-3fc27a38.ply",
+      "fileName": "boosted-model-1789990620674-3fc27a38.ply",
       "originalName": "å¤§ä¸½ç¯è¾final.ply",
       "fileSize": 3443064,
       "splatCount": 14583,
@@ -23,7 +43,7 @@
     {
       "id": "06a1bd4a-b1e7-48c0-842b-04259ea9fb44",
       "name": "黄蜻",
-      "fileName": "model-1789990374828-06a1bd4a.ply",
+      "fileName": "boosted-model-1789990374828-06a1bd4a.ply",
       "originalName": "é»è»final.ply",
       "fileSize": 47412461,
       "splatCount": 200894,
@@ -43,7 +63,7 @@
     {
       "id": "5f1ca057-9ded-43d3-ad66-9998bbd3407c",
       "name": "未知",
-      "fileName": "model-1789989920488-5f1ca057.ply",
+      "fileName": "boosted-model-1789989920488-5f1ca057.ply",
       "originalName": "scene.ply",
       "fileSize": 226249957,
       "splatCount": 958680,
