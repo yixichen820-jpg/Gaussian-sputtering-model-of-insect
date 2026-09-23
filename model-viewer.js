@@ -44,12 +44,15 @@ function frameFromBoundingBox() {
   const center = box.getCenter(new THREE.Vector3());
   const size = box.getSize(new THREE.Vector3());
   const radius = Math.max(size.x, size.y, size.z) / 2;
-  const distance = Math.max(radius * 1.2, radius + 2);
+  const distance = Math.max(radius * 0.55, 0.4);
 
   viewer.camera.up.set(0, 1, 0);
   viewer.camera.position.set(center.x, center.y + radius * 0.2, center.z + distance);
   viewer.camera.lookAt(center);
   viewer.controls.target.copy(center);
+  viewer.controls.minDistance = 0.01;
+  viewer.controls.maxDistance = Math.max(distance * 10, 50);
+  viewer.controls.dollySpeed = 1.2;
   viewer.controls.update();
 }
 
