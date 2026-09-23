@@ -140,18 +140,18 @@ function createViewer() {
     selfDrivenMode: true,
     sharedMemoryForWorkers: canUseSharedMemory,
     gpuAcceleratedSort: canUseSharedMemory && !isMobile,
-    integerBasedSort: false,
+    integerBasedSort: true,
     enableSIMDInSort: true,
-    kernel2DSize: isMobile ? 0.45 : 0.3,
+    kernel2DSize: isMobile ? 0.7 : 0.55,
     splatSortDistanceMapPrecision: 20,
     renderMode: GaussianSplats3D.RenderMode.Always,
     sceneRevealMode: GaussianSplats3D.SceneRevealMode.Instant,
     logLevel: GaussianSplats3D.LogLevel.None,
-    sphericalHarmonicsDegree: isMobile ? 2 : 2,
-    halfPrecisionCovariancesOnGPU: false,
-    maxScreenSpaceSplatSize: isMobile ? 1024 : 2048,
-    optimizeSplatData: false,
-    freeIntermediateSplatData: false
+    sphericalHarmonicsDegree: isMobile ? 1 : 2,
+    halfPrecisionCovariancesOnGPU: isMobile,
+    maxScreenSpaceSplatSize: isMobile ? 512 : 1024,
+    optimizeSplatData: true,
+    freeIntermediateSplatData: true
   });
 
   viewer.controls.autoRotate = false;
