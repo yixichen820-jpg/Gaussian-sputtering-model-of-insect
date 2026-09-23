@@ -20,7 +20,6 @@ let viewer = null;
 let activeIndex = 0;
 let busy = false;
 let modelLoaded = false;
-let viewerStarted = false;
 
 const requestedModel = new URLSearchParams(window.location.search).get('model');
 const formatter = new Intl.NumberFormat('zh-CN');
@@ -89,7 +88,7 @@ function renderModelSwitcher() {
 
 function getCameraFrame(model) {
   const radius = Math.max(...(model.size || [1, 1, 1])) / 2;
-  const distance = Math.max(radius * 1.2, radius + 2.5);
+  const distance = Math.max(radius * 1.65, radius + 5);
   const center = model.center || [0, 0, 0];
   const target = new THREE.Vector3(...center);
   const position = new THREE.Vector3(
@@ -109,22 +108,6 @@ function frameCurrentModel() {
   viewer.camera.position.copy(frame.position);
   viewer.camera.lookAt(frame.target);
   viewer.controls.target.copy(frame.target);
-  viewer.controls.update();
-}
-
-function frameFromBoundingBox() {
-  if (!viewer || !viewer.splatMesh || viewer.splatMesh.scenes.length === 0) return;
-
-  const box = viewer.splatMesh.computeBoundingBox(true, 0);
-  const center = box.getCenter(new THREE.Vector3());
-  const size = box.getSize(new THREE.Vector3());
-  const radius = Math.max(size.x, size.y, size.z) / 2;
-  const distance = Math.max(radius * 1.25, radius + 2);
-
-  viewer.camera.up.set(0, 1, 0);
-  viewer.camera.position.set(center.x, center.y + radius * 0.2, center.z + distance);
-  viewer.camera.lookAt(center);
-  viewer.controls.target.copy(center);
   viewer.controls.update();
 }
 
@@ -157,23 +140,23 @@ function createViewer() {
     selfDrivenMode: true,
     sharedMemoryForWorkers: canUseSharedMemory,
     gpuAcceleratedSort: canUseSharedMemory && !isMobile,
-    integerBasedSort: false,
-    enableSIMDInSort: false,
-    kernel2DSize: isMobile ? 2.0 : 1.5,
+    integerBasedSort: true,
+    enableSIMDInSort: true,
+    kernel2DSize: isMobile ? 0.7 : 0.55,
     splatSortDistanceMapPrecision: 20,
     renderMode: GaussianSplats3D.RenderMode.Always,
     sceneRevealMode: GaussianSplats3D.SceneRevealMode.Instant,
     logLevel: GaussianSplats3D.LogLevel.None,
-    sphericalHarmonicsDegree: 0,
-    halfPrecisionCovariancesOnGPU: false,
-    maxScreenSpaceSplatSize: isMobile ? 2048 : 4096,
-    optimizeSplatData: false,
-    freeIntermediateSplatData: false
+    sphericalHarmonicsDegree: isMobile ? 1 : 2,
+    halfPrecisionCovariancesOnGPU: isMobile,
+    maxScreenSpaceSplatSize: isMobile ? 512 : 1024,
+    optimizeSplatData: true,
+    freeIntermediateSplatData: true
   });
 
   viewer.controls.autoRotate = false;
   viewer.controls.autoRotateSpeed = 0.45;
-  window.viewer = viewer;
+  viewer.start();
 }
 
 async function loadActiveModel() {
@@ -197,7 +180,6 @@ async function loadActiveModel() {
       progressiveLoad: model.splatCount > 100000,
       showLoadingUI: false,
       splatAlphaRemovalThreshold: 1,
-      scale: [model.splatCount > 100000 ? 1 : 2.2, model.splatCount > 100000 ? 1 : 2.2, model.splatCount > 100000 ? 1 : 2.2],
       onProgress: (percentComplete, label) => {
         setProgress(percentComplete);
 
@@ -211,11 +193,6 @@ async function loadActiveModel() {
 
     await loadPromise;
     await waitForViewerIdle();
-    if (!viewerStarted) {
-      viewer.start();
-      viewerStarted = true;
-    }
-    frameFromBoundingBox();
 
     if (!modelLoaded) {
       setStatus('模型已就绪', 'ready');
