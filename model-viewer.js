@@ -1,7 +1,7 @@
 import * as GaussianSplats3D from '@mkkellogg/gaussian-splats-3d';
 import * as THREE from 'three';
 
-const MODEL_URL = '/models/boosted-model-1790093866443-33b83ff1.ply';
+const MODEL_URL = '/models/cleaned-boosted-model-1790093866443-33b83ff1.ply';
 const stage = document.getElementById('stage');
 const statusText = document.getElementById('status-text');
 const statusDot = document.getElementById('status-dot');
