@@ -53,6 +53,9 @@ function frameFromBoundingBox() {
   viewer.controls.minDistance = 0.01;
   viewer.controls.maxDistance = Math.max(distance * 10, 50);
   viewer.controls.dollySpeed = 1.2;
+  viewer.controls.rotateSpeed = 1.45;
+  viewer.controls.panSpeed = 1.45;
+  viewer.controls.zoomSpeed = 1.35;
   viewer.controls.update();
 }
 
