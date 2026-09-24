@@ -138,20 +138,20 @@ function createViewer() {
     initialCameraLookAt: frame.target.toArray(),
     useBuiltInControls: true,
     selfDrivenMode: true,
-    sharedMemoryForWorkers: canUseSharedMemory,
-    gpuAcceleratedSort: canUseSharedMemory && !isMobile,
-    integerBasedSort: true,
-    enableSIMDInSort: true,
+    sharedMemoryForWorkers: false,
+    gpuAcceleratedSort: false,
+    integerBasedSort: false,
+    enableSIMDInSort: false,
     kernel2DSize: isMobile ? 0.7 : 0.55,
     splatSortDistanceMapPrecision: 20,
     renderMode: GaussianSplats3D.RenderMode.Always,
     sceneRevealMode: GaussianSplats3D.SceneRevealMode.Instant,
     logLevel: GaussianSplats3D.LogLevel.None,
-    sphericalHarmonicsDegree: isMobile ? 1 : 2,
-    halfPrecisionCovariancesOnGPU: isMobile,
-    maxScreenSpaceSplatSize: isMobile ? 512 : 1024,
-    optimizeSplatData: true,
-    freeIntermediateSplatData: true
+    sphericalHarmonicsDegree: 0,
+    halfPrecisionCovariancesOnGPU: false,
+    maxScreenSpaceSplatSize: isMobile ? 1024 : 2048,
+    optimizeSplatData: false,
+    freeIntermediateSplatData: false
   });
 
   viewer.controls.autoRotate = false;
