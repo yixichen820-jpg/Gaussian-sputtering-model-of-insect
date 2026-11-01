@@ -19,10 +19,23 @@ const unlockForm = document.getElementById('unlock-form');
 const adminKeyInput = document.getElementById('admin-key-input');
 const lockButton = document.getElementById('lock-button');
 const toast = document.getElementById('toast');
+const addTaxonomyButton = document.getElementById('add-taxonomy-button');
+const taxonomyEditor = document.getElementById('taxonomy-editor');
+const taxonomyNameInput = document.getElementById('taxonomy-name');
+const taxonomyRankInput = document.getElementById('taxonomy-rank');
+const taxonomyParentInput = document.getElementById('taxonomy-parent');
+const taxonomySortInput = document.getElementById('taxonomy-sort');
+const taxonomyKeyTextInput = document.getElementById('taxonomy-key-text');
+const taxonomySaveButton = document.getElementById('taxonomy-save');
+const taxonomyCancelButton = document.getElementById('taxonomy-cancel');
+const taxonomyList = document.getElementById('taxonomy-list');
+const taxonomyHint = document.getElementById('taxonomy-hint');
 
 let models = [];
+let taxonomy = [];
 let unlocked = false;
 let adminKey = '';
+let editingTaxonomyId = null;
 
 createIcons({ icons });
 
@@ -62,7 +75,10 @@ function renderAuthState() {
   authGate.hidden = unlocked;
   uploadSection.hidden = !unlocked;
   lockButton.hidden = !unlocked;
+  addTaxonomyButton.disabled = !unlocked;
+  if (!unlocked && !taxonomyEditor.hidden) closeTaxonomyEditor();
   renderModelRows();
+  renderTaxonomyList();
 }
 
 function requireUnlocked() {
@@ -103,6 +119,179 @@ function createIcon(name) {
   return wrapper;
 }
 
+const taxonomyRankLabels = {
+  order: '目',
+  family: '科',
+  genus: '属',
+  species: '种'
+};
+
+function sortedTaxonomy(parentId) {
+  return taxonomy
+    .filter((entry) => (entry.parentId || null) === (parentId || null))
+    .sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+}
+
+function getTaxonomyEntry(id) {
+  return taxonomy.find((entry) => entry.id === id) || null;
+}
+
+function renderParentOptions(selectedId = '', excludedId = null) {
+  taxonomyParentInput.innerHTML = '';
+  const none = document.createElement('option');
+  none.value = '';
+  none.textContent = '无（顶层）';
+  taxonomyParentInput.append(none);
+
+  const appendOptions = (parentId, depth) => {
+    for (const entry of sortedTaxonomy(parentId)) {
+      if (entry.id === excludedId) continue;
+      const option = document.createElement('option');
+      option.value = entry.id;
+      option.textContent = `${'　'.repeat(depth)}${entry.name}（${taxonomyRankLabels[entry.rank] || entry.rank}）`;
+      option.disabled = entry.id === excludedId;
+      if (entry.id === selectedId) option.selected = true;
+      taxonomyParentInput.append(option);
+      appendOptions(entry.id, depth + 1);
+    }
+  };
+
+  appendOptions(null, 0);
+}
+
+function flattenTaxonomy(parentId = null, depth = 0) {
+  const rows = [];
+  for (const entry of sortedTaxonomy(parentId)) {
+    rows.push({ entry, depth });
+    rows.push(...flattenTaxonomy(entry.id, depth + 1));
+  }
+  return rows;
+}
+
+function openTaxonomyEditor(entry = null) {
+  editingTaxonomyId = entry?.id || null;
+  taxonomyNameInput.value = entry?.name || '';
+  taxonomyRankInput.value = entry?.rank || 'order';
+  taxonomySortInput.value = entry?.sortOrder || '';
+  taxonomyKeyTextInput.value = entry?.keyText || '';
+  renderParentOptions(entry?.parentId || '', entry?.id || null);
+  taxonomyEditor.hidden = false;
+  taxonomyNameInput.focus();
+}
+
+function closeTaxonomyEditor() {
+  editingTaxonomyId = null;
+  taxonomyEditor.hidden = true;
+  taxonomyNameInput.value = '';
+  taxonomyRankInput.value = 'order';
+  taxonomySortInput.value = '';
+  taxonomyKeyTextInput.value = '';
+  renderParentOptions('');
+}
+
+function renderTaxonomyList() {
+  taxonomyList.innerHTML = '';
+  taxonomyHint.textContent = taxonomy.length ? `${taxonomy.length} 个条目` : '';
+
+  for (const { entry, depth } of flattenTaxonomy()) {
+    const row = document.createElement('article');
+    row.className = 'taxonomy-row';
+    row.dataset.id = entry.id;
+    row.style.setProperty('--taxonomy-depth', depth);
+
+    const rank = document.createElement('span');
+    rank.className = 'taxonomy-rank-badge';
+    rank.textContent = taxonomyRankLabels[entry.rank] || entry.rank;
+
+    const main = document.createElement('div');
+    main.className = 'taxonomy-row-main';
+
+    const nameInput = document.createElement('input');
+    nameInput.className = 'taxonomy-name-input';
+    nameInput.value = entry.name;
+    nameInput.disabled = !unlocked;
+    nameInput.setAttribute('aria-label', '分类名称');
+
+    const keyInput = document.createElement('textarea');
+    keyInput.className = 'taxonomy-key-input';
+    keyInput.value = entry.keyText || '';
+    keyInput.rows = 2;
+    keyInput.placeholder = '检索特征（可选）';
+    keyInput.disabled = !unlocked;
+    keyInput.setAttribute('aria-label', '检索特征');
+
+    main.append(nameInput, keyInput);
+
+    const meta = document.createElement('div');
+    meta.className = 'taxonomy-row-meta';
+    meta.textContent = `${modelCountForTaxonomy(entry.id)} 个模型`;
+
+    const actions = document.createElement('div');
+    actions.className = 'model-actions';
+
+    const saveButton = document.createElement('button');
+    saveButton.className = 'action-button';
+    saveButton.type = 'button';
+    saveButton.setAttribute('aria-label', '保存分类');
+    saveButton.disabled = !unlocked;
+    saveButton.append(createIcon('save'));
+    saveButton.addEventListener('click', () => saveTaxonomyRow(entry.id, nameInput, keyInput));
+
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'action-button delete';
+    deleteButton.type = 'button';
+    deleteButton.setAttribute('aria-label', '删除分类');
+    deleteButton.disabled = !unlocked;
+    deleteButton.append(createIcon('trash-2'));
+    deleteButton.addEventListener('click', () => deleteTaxonomy(entry));
+
+    actions.append(saveButton, deleteButton);
+
+    const assignWrap = document.createElement('div');
+    assignWrap.className = 'taxonomy-assign';
+
+    const assignSelect = document.createElement('select');
+    assignSelect.className = 'taxonomy-assign-select';
+    assignSelect.setAttribute('aria-label', `选择要划入${entry.name}的模型`);
+    assignSelect.disabled = !unlocked;
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = '';
+    placeholder.selected = true;
+    assignSelect.append(placeholder);
+    for (const model of models) {
+      const option = document.createElement('option');
+      option.value = model.id;
+      option.textContent = `${model.name}${model.taxonomyId === entry.id ? '（当前）' : ''}`;
+      assignSelect.append(option);
+    }
+
+    const assignButton = document.createElement('button');
+    assignButton.className = 'action-button assign-model-button';
+    assignButton.type = 'button';
+    assignButton.disabled = !unlocked;
+    assignButton.setAttribute('aria-label', '划入此分类');
+    assignButton.append(createIcon('arrow-right'));
+    assignButton.addEventListener('click', () => assignModelToTaxonomy(entry.id, assignSelect));
+
+    assignWrap.append(assignSelect, assignButton);
+    row.append(rank, main, meta, actions, assignWrap);
+    taxonomyList.append(row);
+  }
+
+  createIcons({ icons });
+}
+
+function modelCountForTaxonomy(id) {
+  return models.filter((model) => model.taxonomyId === id).length;
+}
+
+function refreshTaxonomyDependentUi() {
+  updateSummary();
+  renderModelRows();
+  renderTaxonomyList();
+}
+
 function renderModelRows() {
   modelList.innerHTML = '';
   emptyState.hidden = models.length !== 0;
@@ -130,7 +319,7 @@ function renderModelRows() {
     nameInput.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
         event.preventDefault();
-        saveModelName(model.id, nameInput);
+        saveModel(model.id, nameInput, introInput, taxonomySelect);
       }
     });
 
@@ -140,7 +329,37 @@ function renderModelRows() {
     meta.className = 'model-file-meta';
     meta.textContent = `${model.originalName} · ${formatBytes(model.fileSize)}`;
 
-    main.append(nameRow, meta);
+    const introInput = document.createElement('textarea');
+    introInput.className = 'model-intro-input';
+    introInput.value = model.intro || '';
+    introInput.rows = 3;
+    introInput.placeholder = '填写该昆虫模型的介绍（可选）';
+    introInput.setAttribute('aria-label', '模型介绍');
+    introInput.disabled = !unlocked;
+    introInput.addEventListener('keydown', (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+        event.preventDefault();
+        saveModel(model.id, nameInput, introInput, taxonomySelect);
+      }
+    });
+
+    const taxonomySelect = document.createElement('select');
+    taxonomySelect.className = 'model-taxonomy-select';
+    taxonomySelect.setAttribute('aria-label', '模型分类');
+    taxonomySelect.disabled = !unlocked;
+    const emptyOption = document.createElement('option');
+    emptyOption.value = '';
+    emptyOption.textContent = '未分类';
+    taxonomySelect.append(emptyOption);
+    for (const { entry, depth } of flattenTaxonomy()) {
+      const option = document.createElement('option');
+      option.value = entry.id;
+      option.textContent = `${'　'.repeat(depth)}${entry.name}`;
+      if (entry.id === model.taxonomyId) option.selected = true;
+      taxonomySelect.append(option);
+    }
+
+    main.append(nameRow, meta, introInput, taxonomySelect);
 
     const details = document.createElement('div');
     details.className = 'model-details';
@@ -155,10 +374,10 @@ function renderModelRows() {
     const saveButton = document.createElement('button');
     saveButton.className = 'action-button';
     saveButton.type = 'button';
-    saveButton.setAttribute('aria-label', '保存名称');
+    saveButton.setAttribute('aria-label', '保存修改');
     saveButton.disabled = !unlocked;
     saveButton.append(createIcon('save'));
-    saveButton.addEventListener('click', () => saveModelName(model.id, nameInput));
+    saveButton.addEventListener('click', () => saveModel(model.id, nameInput, introInput, taxonomySelect));
 
     const deleteButton = document.createElement('button');
     deleteButton.className = 'action-button delete';
@@ -183,25 +402,38 @@ async function loadModels() {
   }
   const data = await response.json();
   models = data.models || [];
-  updateSummary();
+  refreshTaxonomyDependentUi();
+}
+
+async function loadTaxonomy() {
+  const response = await fetch('/api/taxonomy');
+  if (!response.ok) {
+    throw new Error('无法读取分类列表。');
+  }
+  const data = await response.json();
+  taxonomy = data.taxonomy || [];
+  renderTaxonomyList();
   renderModelRows();
 }
 
-async function saveModelName(id, input) {
+async function saveModel(id, nameInput, introInput, taxonomySelect) {
   if (!requireUnlocked()) return;
 
-  const nextName = input.value.trim();
+  const nextName = nameInput.value.trim();
   if (!nextName) {
-    input.value = models.find((model) => model.id === id)?.name || '';
+    nameInput.value = models.find((model) => model.id === id)?.name || '';
     showToast('模型名称不能为空', true);
     return;
   }
+
+  const nextIntro = (introInput?.value || '').trim();
+  const nextTaxonomyId = taxonomySelect?.value || null;
 
   try {
     const response = await fetch(`/api/models/${encodeURIComponent(id)}`, {
       method: 'PATCH',
       headers: authHeaders(true),
-      body: JSON.stringify({ name: nextName })
+      body: JSON.stringify({ name: nextName, intro: nextIntro, taxonomyId: nextTaxonomyId })
     });
 
     if (!response.ok) {
@@ -210,9 +442,13 @@ async function saveModelName(id, input) {
     }
 
     const model = models.find((item) => item.id === id);
-    if (model) model.name = nextName;
-    updateSummary();
-    showToast('名称已保存');
+    if (model) {
+      model.name = nextName;
+      model.intro = nextIntro;
+      model.taxonomyId = nextTaxonomyId;
+    }
+    refreshTaxonomyDependentUi();
+    showToast('修改已保存');
   } catch (error) {
     showToast(error.message || '保存失败', true);
   }
@@ -240,6 +476,158 @@ async function deleteModel(model) {
     showToast('模型已删除');
   } catch (error) {
     showToast(error.message || '删除失败', true);
+  }
+}
+
+async function saveTaxonomyRow(id, nameInput, keyInput) {
+  if (!requireUnlocked()) return;
+
+  const name = nameInput.value.trim();
+  if (!name) {
+    nameInput.value = getTaxonomyEntry(id)?.name || '';
+    showToast('分类名称不能为空', true);
+    return;
+  }
+
+  const entry = getTaxonomyEntry(id);
+  if (!entry) {
+    showToast('分类条目不存在', true);
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/taxonomy/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: authHeaders(true),
+      body: JSON.stringify({
+        name,
+        rank: entry.rank,
+        parentId: entry.parentId,
+        keyText: (keyInput?.value || '').trim(),
+        sortOrder: entry.sortOrder
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || '保存失败。');
+    }
+
+    const data = await response.json();
+    Object.assign(entry, data.entry);
+    refreshTaxonomyDependentUi();
+    showToast('分类已保存');
+  } catch (error) {
+    showToast(error.message || '保存失败', true);
+  }
+}
+
+async function assignModelToTaxonomy(taxonomyId, assignSelect) {
+  if (!requireUnlocked()) return;
+
+  const modelId = assignSelect?.value;
+  if (!modelId) {
+    showToast('请选择要划入的模型', true);
+    return;
+  }
+
+  const entry = getTaxonomyEntry(taxonomyId);
+  const model = models.find((item) => item.id === modelId);
+  if (!entry || !model) return;
+
+  try {
+    const response = await fetch(`/api/models/${encodeURIComponent(modelId)}`, {
+      method: 'PATCH',
+      headers: authHeaders(true),
+      body: JSON.stringify({ taxonomyId })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || '划入分类失败。');
+    }
+
+    const data = await response.json();
+    model.taxonomyId = taxonomyId;
+    model.taxonomyName = data.model?.taxonomyName || entry.name;
+    refreshTaxonomyDependentUi();
+    showToast(`已将“${model.name}”划入${entry.name}`);
+  } catch (error) {
+    showToast(error.message || '划入分类失败', true);
+  }
+}
+
+async function deleteTaxonomy(entry) {
+  if (!requireUnlocked()) return;
+  if (!window.confirm(`确定删除“${entry.name}”吗？`)) return;
+
+  try {
+    const response = await fetch(`/api/taxonomy/${encodeURIComponent(entry.id)}`, {
+      method: 'DELETE',
+      headers: authHeaders()
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || '删除失败。');
+    }
+
+    taxonomy = taxonomy.filter((item) => item.id !== entry.id);
+    refreshTaxonomyDependentUi();
+    showToast('分类已删除');
+  } catch (error) {
+    showToast(error.message || '删除失败', true);
+  }
+}
+
+async function submitTaxonomyEditor() {
+  if (!requireUnlocked()) return;
+
+  const name = taxonomyNameInput.value.trim();
+  if (!name) {
+    showToast('分类名称不能为空', true);
+    taxonomyNameInput.focus();
+    return;
+  }
+
+  const payload = {
+    name,
+    rank: taxonomyRankInput.value,
+    parentId: taxonomyParentInput.value || null,
+    keyText: taxonomyKeyTextInput.value.trim(),
+    sortOrder: Number(taxonomySortInput.value) || undefined
+  };
+
+  const url = editingTaxonomyId
+    ? `/api/taxonomy/${encodeURIComponent(editingTaxonomyId)}`
+    : '/api/taxonomy';
+  const method = editingTaxonomyId ? 'PATCH' : 'POST';
+
+  try {
+    const response = await fetch(url, {
+      method,
+      headers: authHeaders(true),
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || '保存失败。');
+    }
+
+    const data = await response.json();
+    if (editingTaxonomyId) {
+      const entry = getTaxonomyEntry(editingTaxonomyId);
+      Object.assign(entry, data.entry);
+    } else {
+      taxonomy.push(data.entry);
+    }
+
+    closeTaxonomyEditor();
+    refreshTaxonomyDependentUi();
+    showToast('分类已保存');
+  } catch (error) {
+    showToast(error.message || '保存失败', true);
   }
 }
 
@@ -341,6 +729,20 @@ uploadZone.addEventListener('drop', (event) => {
   handleFiles(event.dataTransfer.files);
 });
 
+addTaxonomyButton.addEventListener('click', () => {
+  if (!requireUnlocked()) return;
+  openTaxonomyEditor();
+});
+
+taxonomySaveButton.addEventListener('click', submitTaxonomyEditor);
+taxonomyCancelButton.addEventListener('click', closeTaxonomyEditor);
+taxonomyNameInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    submitTaxonomyEditor();
+  }
+});
+
 unlockForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   const key = adminKeyInput.value.trim();
@@ -388,6 +790,6 @@ lockButton.addEventListener('click', () => {
 
 readStoredAuth();
 renderAuthState();
-loadModels().catch((error) => {
+Promise.all([loadModels(), loadTaxonomy()]).catch((error) => {
   showToast(error.message || '加载失败', true);
 });

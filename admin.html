@@ -95,6 +95,61 @@
           </div>
         </section>
 
+        <section class="taxonomy-section">
+          <div class="section-heading">
+            <div>
+              <h2>分类条目</h2>
+              <span id="taxonomy-hint"></span>
+            </div>
+            <button class="back-link add-taxonomy-button" id="add-taxonomy-button" type="button">
+              <i data-lucide="plus"></i>
+              <span>新增分类</span>
+            </button>
+          </div>
+          <form class="taxonomy-editor" id="taxonomy-editor" hidden>
+            <div class="taxonomy-editor-grid">
+              <label>
+                <span>分类名称</span>
+                <input id="taxonomy-name" type="text" maxlength="50" placeholder="例如：鞘翅目" />
+              </label>
+              <label>
+                <span>层级</span>
+                <select id="taxonomy-rank">
+                  <option value="order">目</option>
+                  <option value="family">科</option>
+                  <option value="genus">属</option>
+                  <option value="species">种</option>
+                </select>
+              </label>
+              <label>
+                <span>父级分类</span>
+                <select id="taxonomy-parent">
+                  <option value="">无（顶层）</option>
+                </select>
+              </label>
+              <label>
+                <span>排序</span>
+                <input id="taxonomy-sort" type="number" min="1" step="1" value="1" />
+              </label>
+            </div>
+            <label class="taxonomy-key-label">
+              <span>检索特征</span>
+              <textarea id="taxonomy-key-text" rows="3" maxlength="500" placeholder="用于生物检索表的区分特征，例如：前翅角质硬化，形成鞘翅。"></textarea>
+            </label>
+            <div class="taxonomy-editor-actions">
+              <button class="action-button primary-action" id="taxonomy-save" type="button">
+                <i data-lucide="save"></i>
+                <span>保存分类</span>
+              </button>
+              <button class="action-button" id="taxonomy-cancel" type="button">
+                <i data-lucide="x"></i>
+                <span>取消</span>
+              </button>
+            </div>
+          </form>
+          <div id="taxonomy-list" class="taxonomy-list"></div>
+        </section>
+
         <section class="model-list-section">
           <div class="section-heading">
             <h2>模型列表</h2>

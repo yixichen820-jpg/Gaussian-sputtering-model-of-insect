@@ -31,7 +31,24 @@
           </div>
         </div>
 
-        <div class="model-switcher" id="model-switcher" role="tablist" aria-label="模型切换"></div>
+        <div class="center-controls">
+          <div class="search-box">
+            <i data-lucide="search"></i>
+            <input id="search-input" type="search" placeholder="搜索模型或分类" autocomplete="off" />
+            <button id="search-clear" type="button" aria-label="清空搜索" hidden>
+              <i data-lucide="x"></i>
+            </button>
+            <div class="search-results" id="search-results" hidden></div>
+          </div>
+          <div class="model-switcher" id="model-switcher" role="tablist" aria-label="模型切换"></div>
+          <div class="active-filter" id="active-filter" hidden>
+            <i data-lucide="filter"></i>
+            <span id="active-filter-label"></span>
+            <button id="active-filter-clear" type="button" aria-label="清除分类筛选">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+        </div>
 
         <div class="toolbar" aria-label="视图工具">
           <button class="icon-button" id="auto-rotate" type="button" aria-label="自动环绕" aria-pressed="false">
@@ -49,22 +66,63 @@
         </div>
       </header>
 
-      <aside class="info-panel">
-        <div class="info-heading">
-          <span class="status-dot" id="status-dot"></span>
-          <span id="status-text">准备加载</span>
+      <aside class="side-panel" id="side-panel">
+        <div class="side-panel-head">
+          <span class="side-panel-title">
+            <i data-lucide="list-tree"></i>
+            <span>分类与介绍</span>
+          </span>
+          <button class="icon-button panel-collapse" id="panel-collapse" type="button" aria-label="折叠侧栏" aria-pressed="false">
+            <i data-lucide="panel-left-close"></i>
+          </button>
         </div>
-        <div class="info-meta">
-          <div>
-            <span class="meta-label">模型</span>
-            <strong id="model-name">原视频</strong>
+        <div class="side-panel-body" id="side-panel-body">
+          <div class="side-status">
+            <span class="status-dot" id="status-dot"></span>
+            <span id="status-text">准备加载</span>
           </div>
-          <div>
-            <span class="meta-label">高斯点</span>
-            <strong id="splat-count">460,668</strong>
+          <div class="side-model-card">
+            <div class="side-model-name">
+              <span class="meta-label">模型</span>
+              <strong id="model-name">原视频</strong>
+            </div>
+            <div class="side-model-points">
+              <span class="meta-label">高斯点</span>
+              <strong id="splat-count">460,668</strong>
+            </div>
+            <div class="info-taxonomy" id="info-taxonomy">未分类</div>
           </div>
+          <div class="side-section-title">模型介绍</div>
+          <div class="side-intro" id="intro-text">暂无介绍。</div>
+          <div class="side-section-title">分类条目</div>
+          <p class="taxonomy-hint">点击分类查看该目下的模型，点击箭头展开下级分类。</p>
+          <div class="taxonomy-tree" id="taxonomy-tree"></div>
+          <div class="side-section-head">
+            <span class="side-section-title">全部模型</span>
+            <button class="all-models-toggle" id="all-models-toggle" type="button" aria-label="展开全部模型" aria-pressed="false">
+              <i data-lucide="chevron-down"></i>
+            </button>
+          </div>
+          <div class="all-models-list" id="all-models-list" hidden></div>
+        </div>
+
+        <div class="taxonomy-drawer" id="taxonomy-drawer" hidden>
+          <div class="taxonomy-drawer-head">
+            <div class="taxonomy-drawer-title-wrap">
+              <span class="taxonomy-drawer-label">分类模型</span>
+              <strong id="taxonomy-drawer-title"></strong>
+            </div>
+            <button class="icon-button taxonomy-drawer-close" id="taxonomy-drawer-close" type="button" aria-label="关闭分类模型抽屉">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+          <div class="taxonomy-drawer-list" id="taxonomy-drawer-list"></div>
         </div>
       </aside>
+
+      <div class="help-tip">
+        触屏使用，单指滑动为改变视角，双指滑动可移动模型同时可以进行缩放；PC端操作，鼠标左键变换视角，右键移动模型，滚轮进行缩放
+      </div>
 
       <div class="progress-track" id="progress-track" aria-hidden="true">
         <div class="progress-fill" id="progress-fill"></div>

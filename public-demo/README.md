@@ -1,12 +1,8 @@
 # 大丽灯蛾静态展示
 
-这是不依赖 Node.js 后端的纯静态展示页，使用一个压缩后的 `.spz` 模型文件。
+这是不依赖 Node.js 后端的纯静态展示页，通过阿里云 OSS 加载压缩后的 `.spz` 模型。
 
-部署到 GitHub Pages 前，请把模型文件放在：
-
-```text
-public-demo/models/大丽灯蛾final.spz
-```
+模型地址在 `public-demo/main.js` 的 `MODEL_URL` 中配置。
 
 入口页面：
 
