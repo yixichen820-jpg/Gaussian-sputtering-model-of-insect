@@ -28,7 +28,9 @@ body {
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
 }
 
@@ -134,10 +136,13 @@ h1 {
 
 .admin-main {
   display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
   gap: 28px;
 }
 
 .auth-gate {
+  grid-column: 1 / -1;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
   align-items: center;
@@ -234,6 +239,7 @@ h1 {
 }
 
 .upload-section {
+  grid-column: 1 / -1;
   display: grid;
   gap: 14px;
 }
@@ -334,6 +340,7 @@ h1 {
 }
 
 .summary-band {
+  grid-column: 1 / -1;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   border-top: 1px solid var(--line);
@@ -361,6 +368,260 @@ h1 {
 .summary-band strong {
   font-size: 22px;
   font-weight: 650;
+}
+
+.taxonomy-section {
+  min-width: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.model-list-section {
+  min-width: 0;
+}
+
+.section-heading > div:first-child {
+  min-width: 0;
+}
+
+#taxonomy-hint {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.add-taxonomy-button {
+  color: var(--accent);
+  border-color: rgba(125, 211, 168, 0.32);
+}
+
+.add-taxonomy-button:hover {
+  color: var(--accent);
+  border-color: rgba(125, 211, 168, 0.62);
+}
+
+.add-taxonomy-button:disabled {
+  color: var(--muted);
+  border-color: var(--line);
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.taxonomy-editor {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid rgba(125, 211, 168, 0.28);
+  border-radius: 13px;
+  background: linear-gradient(135deg, rgba(125, 211, 168, 0.06), rgba(125, 211, 168, 0.015));
+}
+
+.taxonomy-editor[hidden] {
+  display: none;
+}
+
+.taxonomy-editor-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) 110px minmax(0, 1fr) 90px;
+  gap: 12px;
+}
+
+.taxonomy-editor label,
+.taxonomy-key-label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.taxonomy-editor input,
+.taxonomy-editor select,
+.taxonomy-editor textarea,
+.taxonomy-name-input,
+.taxonomy-key-input,
+.model-taxonomy-select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  color: var(--text);
+  background: rgba(9, 11, 15, 0.72);
+  outline: none;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.taxonomy-editor input,
+.taxonomy-editor select,
+.taxonomy-name-input,
+.model-taxonomy-select {
+  height: 42px;
+  padding: 0 11px;
+}
+
+.taxonomy-editor textarea,
+.taxonomy-key-input {
+  padding: 9px 11px;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.taxonomy-editor input:focus,
+.taxonomy-editor select:focus,
+.taxonomy-editor textarea:focus,
+.taxonomy-name-input:focus,
+.taxonomy-key-input:focus,
+.model-taxonomy-select:focus {
+  border-color: rgba(125, 211, 168, 0.65);
+  background: rgba(9, 11, 15, 0.92);
+}
+
+.taxonomy-editor input:disabled,
+.taxonomy-editor select:disabled,
+.taxonomy-editor textarea:disabled,
+.taxonomy-name-input:disabled,
+.taxonomy-key-input:disabled,
+.model-taxonomy-select:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.taxonomy-editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.taxonomy-editor-actions .action-button {
+  width: auto;
+  padding: 0 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.taxonomy-editor-actions .action-button svg {
+  width: 15px;
+  height: 15px;
+}
+
+.taxonomy-editor-actions .primary-action {
+  color: #102017;
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.taxonomy-editor-actions .primary-action:hover {
+  color: #102017;
+  background: #8be0b5;
+  border-color: #8be0b5;
+}
+
+.taxonomy-list {
+  display: grid;
+  gap: 9px;
+}
+
+.taxonomy-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: start;
+  gap: 12px;
+  padding: 14px;
+  padding-left: calc(14px + var(--taxonomy-depth, 0) * 20px);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.taxonomy-row:hover {
+  border-color: var(--line);
+  background: var(--surface-soft);
+}
+
+.taxonomy-rank-badge {
+  margin-top: 8px;
+  padding: 3px 6px;
+  border: 1px solid rgba(125, 211, 168, 0.26);
+  border-radius: 6px;
+  color: var(--accent);
+  background: rgba(125, 211, 168, 0.08);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.taxonomy-row-main {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.taxonomy-name-input {
+  font-weight: 650;
+}
+
+.taxonomy-key-input {
+  font-size: 12px;
+}
+
+.taxonomy-row-meta {
+  padding-top: 9px;
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.taxonomy-assign {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 10px;
+  margin-top: 10px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.taxonomy-assign-select {
+  min-width: 0;
+  flex: 1;
+  height: 36px;
+  padding: 0 9px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  color: var(--text);
+  background: rgba(9, 11, 15, 0.72);
+  font-size: 12px;
+  outline: none;
+}
+
+.taxonomy-assign-select:focus {
+  border-color: rgba(125, 211, 168, 0.65);
+}
+
+.taxonomy-assign-select:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.assign-model-button {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+}
+
+.assign-model-button:hover {
+  color: var(--accent);
+  border-color: rgba(125, 211, 168, 0.45);
+  background: rgba(125, 211, 168, 0.08);
+}
+
+.model-taxonomy-select {
+  margin: 10px 0 0 44px;
+  max-width: 260px;
+  font-size: 12px;
 }
 
 .section-heading {
@@ -450,6 +711,34 @@ h1 {
 }
 
 .model-name-input:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.model-intro-input {
+  width: 100%;
+  min-width: 0;
+  margin: 12px 0 0 44px;
+  padding: 10px 11px;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.035);
+  font-size: 13px;
+  line-height: 1.55;
+  resize: vertical;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.model-intro-input:hover,
+.model-intro-input:focus {
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.06);
+  outline: none;
+}
+
+.model-intro-input:disabled {
   color: var(--muted);
   cursor: not-allowed;
   opacity: 0.72;
@@ -576,6 +865,20 @@ h1 {
   border-color: rgba(226, 122, 114, 0.5);
 }
 
+@media (max-width: 720px) {
+  .admin-main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .auth-gate,
+  .upload-section,
+  .summary-band,
+  .taxonomy-section,
+  .model-list-section {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 760px) {
   .admin-shell {
     width: min(100% - 28px, 1120px);
@@ -603,6 +906,19 @@ h1 {
   .model-row {
     grid-template-columns: 1fr auto;
     gap: 14px;
+  }
+
+  .taxonomy-editor-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .taxonomy-row {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .taxonomy-row-meta {
+    grid-column: 2;
+    padding-top: 0;
   }
 
   .model-details {
@@ -643,5 +959,18 @@ h1 {
 
   .model-row {
     padding: 14px;
+  }
+
+  .taxonomy-editor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .taxonomy-row {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .model-taxonomy-select {
+    margin-left: 0;
+    max-width: none;
   }
 }

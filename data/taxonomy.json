@@ -1,0 +1,134 @@
+{
+  "entries": [
+    {
+      "id": "order-coleoptera",
+      "name": "鞘翅目",
+      "rank": "order",
+      "parentId": null,
+      "keyText": "前翅角质硬化，形成鞘翅；后翅膜质，静止时折叠于鞘翅下。",
+      "sortOrder": 1,
+      "createdAt": "2026-09-29T00:00:00.000Z",
+      "updatedAt": "2026-09-29T00:00:00.000Z"
+    },
+    {
+      "id": "order-hemiptera",
+      "name": "半翅目",
+      "rank": "order",
+      "parentId": null,
+      "keyText": "口器刺吸式；前翅基部革质，端部膜质，静止时平覆背上。",
+      "sortOrder": 2,
+      "createdAt": "2026-09-29T00:00:00.000Z",
+      "updatedAt": "2026-09-29T00:00:00.000Z"
+    },
+    {
+      "id": "order-lepidoptera",
+      "name": "鳞翅目",
+      "rank": "order",
+      "parentId": null,
+      "keyText": "体翅密被鳞片；口器虹吸式，多数种类翅色斑纹鲜明。",
+      "sortOrder": 3,
+      "createdAt": "2026-09-29T00:00:00.000Z",
+      "updatedAt": "2026-09-29T00:00:00.000Z"
+    },
+    {
+      "id": "order-neuroptera",
+      "name": "脉翅目",
+      "rank": "order",
+      "parentId": null,
+      "keyText": "两对膜质翅，翅脉多而呈网状；口器咀嚼式。",
+      "sortOrder": 4,
+      "createdAt": "2026-09-29T00:00:00.000Z",
+      "updatedAt": "2026-09-29T00:00:00.000Z"
+    },
+    {
+      "id": "order-odonata",
+      "name": "蜻蜓目",
+      "rank": "order",
+      "parentId": null,
+      "keyText": "复眼发达；翅长而窄，膜质透明，翅脉网状。",
+      "sortOrder": 5,
+      "createdAt": "2026-09-29T00:00:00.000Z",
+      "updatedAt": "2026-09-29T00:00:00.000Z"
+    },
+    {
+      "id": "order-hymenoptera",
+      "name": "膜翅目",
+      "rank": "order",
+      "parentId": null,
+      "keyText": "两对膜质翅，后翅小于前翅；雌虫常具产卵器。",
+      "sortOrder": 6,
+      "createdAt": "2026-09-29T00:00:00.000Z",
+      "updatedAt": "2026-09-29T00:00:00.000Z"
+    },
+    {
+      "id": "order-diptera",
+      "name": "双翅目",
+      "rank": "order",
+      "parentId": null,
+      "keyText": "仅一对前翅发达；后翅退化为平衡棒。",
+      "sortOrder": 7,
+      "createdAt": "2026-09-29T00:00:00.000Z",
+      "updatedAt": "2026-09-29T00:00:00.000Z"
+    },
+    {
+      "id": "order-blattodea",
+      "name": "蜚蠊目",
+      "rank": "order",
+      "parentId": null,
+      "keyText": "体扁平，前胸背板宽大；前翅革质，后翅膜质。",
+      "sortOrder": 8,
+      "createdAt": "2026-09-29T00:00:00.000Z",
+      "updatedAt": "2026-09-29T00:00:00.000Z"
+    },
+    {
+      "id": "order-dermaptera",
+      "name": "革翅目",
+      "rank": "order",
+      "parentId": null,
+      "keyText": "腹末具坚硬铗状尾须；前翅短小革质，后翅膜质。",
+      "sortOrder": 9,
+      "createdAt": "2026-09-29T00:00:00.000Z",
+      "updatedAt": "2026-09-29T00:00:00.000Z"
+    },
+    {
+      "id": "order-mantodea",
+      "name": "螳螂目",
+      "rank": "order",
+      "parentId": null,
+      "keyText": "前足为捕捉足；前胸细长，头部灵活。",
+      "sortOrder": 10,
+      "createdAt": "2026-09-29T00:00:00.000Z",
+      "updatedAt": "2026-09-29T00:00:00.000Z"
+    },
+    {
+      "id": "order-phasmatodea",
+      "name": "䗛目",
+      "rank": "order",
+      "parentId": null,
+      "keyText": "体形细长如枝，翅常退化或缺失；具拟态。",
+      "sortOrder": 11,
+      "createdAt": "2026-09-29T00:00:00.000Z",
+      "updatedAt": "2026-09-29T00:00:00.000Z"
+    },
+    {
+      "id": "order-orthoptera",
+      "name": "直翅目",
+      "rank": "order",
+      "parentId": null,
+      "keyText": "后足常为跳跃足；前翅狭长革质，后翅膜质。",
+      "sortOrder": 12,
+      "createdAt": "2026-09-29T00:00:00.000Z",
+      "updatedAt": "2026-09-29T00:00:00.000Z"
+    },
+    {
+      "id": "order-unknown",
+      "name": "未知目",
+      "rank": "order",
+      "parentId": null,
+      "keyText": "尚未确定分类或暂未归入已知目。",
+      "sortOrder": 13,
+      "createdAt": "2026-09-29T00:00:00.000Z",
+      "updatedAt": "2026-09-29T00:00:00.000Z"
+    }
+  ]
+}

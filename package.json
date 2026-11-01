@@ -2,7 +2,7 @@
   "name": "insect-gaussian-splat-viewer",
   "version": "1.0.0",
   "private": true,
-  "description": "Two PLY Gaussian splat model showcase viewer.",
+  "description": "昆虫高斯溅射模型展示与 PLY 管理平台。",
   "type": "commonjs",
   "scripts": {
     "dev": "node server.js",
@@ -10,10 +10,10 @@
   },
   "dependencies": {
     "@mkkellogg/gaussian-splats-3d": "^0.4.7",
-    "@playcanvas/supersplat-viewer": "^1.32.0",
+    "ali-oss": "^6.23.0",
     "busboy": "^1.6.0",
-    "gsplat": "^1.2.9",
+    "dotenv": "^18.0.3",
     "lucide": "^1.47.0",
-    "three": "^0.170.0"
+    "three": "^0.186.0"
   }
 }
