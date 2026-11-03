@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>更新日志</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23090b0f'/><path d='M8 17l5 5 11-12' fill='none' stroke='%237dd3a8' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>" />
+    <link rel="stylesheet" href="/style.css" />
+    <style>
+      body { overflow: auto; background: #090b0f; }
+      .changelog-wrap { width: min(720px, calc(100% - 48px)); margin: 0 auto; padding: 48px 0 64px; color: #f4f7fb; font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; }
+      h1 { font-size: 22px; margin-bottom: 8px; }
+      .changelog-meta { color: #9aa7b5; font-size: 12px; margin-bottom: 28px; }
+      h2 { font-size: 16px; margin-top: 26px; }
+      p, li { color: #c5ced7; line-height: 1.8; font-size: 14px; }
+      .changelog-wrap { padding-bottom: 96px; }
+      .changelog-site-version {
+        position: fixed;
+        z-index: 20;
+        left: 24px;
+        bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        color: rgba(154, 167, 181, 0.72);
+        font-size: 10px;
+        letter-spacing: 0.02em;
+      }
+      .changelog-site-version a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .changelog-site-version a:hover { color: #c5ced7; }
+      @media (max-width: 860px) {
+        .changelog-site-version { left: 14px; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="changelog-wrap">
+      <h1>更新日志</h1>
+      <div class="changelog-meta">V8.7</div>
+      <h2>本次更新（V8.7）</h2>
+      <p>首页改为按需加载：首次进入只加载页面、分类、模型元数据和静态缩略图，不再自动请求 3D 模型。</p>
+      <p>目录页左侧只展示分类条目与目级分类，不再显示未选择模型的介绍和署名；进入模型详情后再恢复完整的“分类与介绍”内容。</p>
+      <p>主目录增加浅色与深色主题切换，并与模型详情页的主题状态保持同步和持久化。</p>
+      <p>管理页“模型列表”支持逐个添加、更换或清除 JPG、PNG、WebP 缩略图；未设置缩略图的模型统一显示占位图。</p>
+      <p>修复 OSS 缩略图在浏览器跨域隔离策略下被拦截并错误回退到占位图的问题。</p>
+      <p>修复每页显示数量增大时卡片被压缩、缩略图与名称和分类文字重叠的问题；卡片保持固定比例，内容超出时目录区域滚动。</p>
+      <p>模型列表增加静态缩略图和统一占位图；点击模型后才创建或复用 3D 查看器并加载对应 PLY。搜索、筛选和分类切换不会触发模型下载。</p>
+      <p>详情页不再使用旧的顶部或底部模型切换器；切换模型时必须返回主界面重新选择，避免连续切换覆盖和重复初始化。</p>
+      <p>管理入口移至主界面左下角，版本入口与“CYC联合创建”在主页、详情页、管理页和更新日志页统一显示。</p>
+      <p>同步启用完整三阶球谐颜色渲染，改善模型在不同观察角度下的颜色和层次。</p>
+      <p>本地测试：桌面端和移动端首屏均未请求 PLY；点击模型后正常就绪；分类、搜索、筛选、主题、分享链接和图标显示正常；缩略图添加、替换、清除与删除清理通过隔离测试；浏览器控制台无错误。</p>
+      <p>更新日期：2026-11-01。涉及文件：main.js、index.html、style.css、admin.html、admin.js、admin.css、server.js、changelog.html，以及新增缩略图资源。</p>
+      <h2>V8.7 补充修复</h2>
+      <p>修复返回主界面后再次选择模型时，如果上一个模型仍在加载，3D 展示可能停留在旧模型的问题。</p>
+      <p>加载新模型前改为清空查看器中的全部旧场景，并确认场景清空完成后再请求和初始化目标模型；清理失败时停止加载并显示错误，避免继续展示错误模型。</p>
+      <p>调整顶部工具栏与目录搜索框的层级和间距，修复返回按钮被搜索框遮挡的问题。</p>
+      <p>修复测试页顶部网站铭牌和工具栏穿透到模型目录的问题；模型加载期间隐藏旧画布，仅在目标模型就绪后显示。</p>
+      <p>管理后台由 Lucide 全量图标导入改为按需加载：无缓存测试中图标模块请求从 248 个降至 27 个，后台首次可操作时间由约 3.96 秒降至约 0.67 秒；全部页面图标和动态图标正常显示。</p>
+      <p>更新日期：2026-11-03。此次为 V8.7 内部修订，不更新版本号；涉及文件：main.js、index.html、style.css、admin.js、changelog.html。</p>
+      <h2>V8.6</h2>
+      <p>优化首页 Lucide 图标加载方式，从全量图标导入改为按需加载，显著减少首屏模块请求数量，加快页面初始化和模型加载准备时间。</p>
+      <p>本地测试：首页静态与动态图标均正常；分类树、搜索、筛选、侧边栏、模型加载和模型切换功能未受影响；浏览器控制台无新增错误。</p>
+      <p>更新日期：2026-10-31。</p>
+      <h2>V8.5</h2>
+      <p>修复管理页「增添」新增分类/阶元时编辑器不显示、搜索精确匹配结果被截断、搜索下拉被遮挡的问题。</p>
+      <p>整理分类数据：补齐常见科的中文名，停用生僻科，删除化石科；展示页分类树与搜索仅显示启用条目。</p>
+      <h2>V8.4</h2>
+      <p>完善了展示页布局，增加了浅色和深色界面风格；对管理界面不同管理模块做了切换条，将不同模块独立放入切换条中；提升网站使用便捷性。</p>
+      <p>新增标本署名：每个模型可记录采集者、鉴定者、模型构建者，修改留有历史记录。</p>
+      <h2>V8.3</h2>
+      <p>新增视角球，区分了“回到原点”和“全屏展示”的图标，完善了展示页。</p>
+    </main>
+    <footer class="changelog-site-version">
+      <a href="/changelog.html">V8.7</a>
+      <span>CYC联合创建</span>
+    </footer>
+  </body>
+</html>

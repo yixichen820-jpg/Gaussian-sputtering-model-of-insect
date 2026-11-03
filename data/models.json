@@ -1,3 +1,337 @@
 {
-  "models": []
+  "models": [
+    {
+      "id": "0a7fdb94-d3e6-4d08-bc1b-2354038b5f5c",
+      "name": "edit",
+      "fileName": "model-1793510556557-0a7fdb94.splat",
+      "originalName": "edit.splat",
+      "fileSize": 2732672,
+      "splatCount": 0,
+      "center": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        1,
+        1,
+        1
+      ],
+      "intro": "",
+      "taxonomyId": null,
+      "taxonomyName": "",
+      "storage": "oss",
+      "createdAt": "2026-11-01T05:22:36.967Z",
+      "updatedAt": "2026-11-01T06:41:59.918Z",
+      "attribution": {
+        "collector": "",
+        "identifier": "",
+        "builder": ""
+      },
+      "attributionLog": [],
+      "thumbnailFileName": "thumb-1793515319815-0a7fdb94.png",
+      "thumbnailStorage": "oss",
+      "thumbnailFileSize": 124176
+    },
+    {
+      "id": "103d15a8-d145-48cf-9494-c1af81e80bbe",
+      "name": "edit",
+      "fileName": "model-1793506323710-103d15a8.ply",
+      "originalName": "edit.ply",
+      "fileSize": 67938226,
+      "splatCount": 287867,
+      "center": [
+        0.20212924480438232,
+        0.19778680801391602,
+        0.2981966733932495
+      ],
+      "size": [
+        3.51700496673584,
+        3.5343828201293945,
+        2.3218724727630615
+      ],
+      "intro": "",
+      "taxonomyId": null,
+      "taxonomyName": "",
+      "storage": "oss",
+      "createdAt": "2026-11-01T04:12:09.676Z",
+      "updatedAt": "2026-11-01T04:12:09.676Z",
+      "attribution": {
+        "collector": "",
+        "identifier": "",
+        "builder": ""
+      },
+      "attributionLog": []
+    },
+    {
+      "id": "7c667cf5-3f45-4524-8a3a-25bb1da0ab8d",
+      "name": "日伪阔花金龟",
+      "fileName": "model-1792070935448-7c667cf5.ply",
+      "originalName": "final.ply",
+      "fileSize": 10553649,
+      "splatCount": 44712,
+      "center": [
+        0.28611837700009346,
+        0.9472486227750778,
+        1.1478487253189087
+      ],
+      "size": [
+        0.7963328585028648,
+        0.9565915167331696,
+        0.9180958271026611
+      ],
+      "intro": "",
+      "taxonomyId": "inat-48201",
+      "taxonomyName": "",
+      "storage": "oss",
+      "createdAt": "2026-10-15T13:28:55.662Z",
+      "updatedAt": "2026-10-15T13:38:48.404Z",
+      "attribution": {
+        "collector": "陈隐曦",
+        "identifier": "陈隐曦",
+        "builder": "陈隐曦"
+      },
+      "attributionLog": []
+    },
+    {
+      "id": "7d6fd75d-449f-4692-99a5-4b25c9eb1265",
+      "name": "绿带翠凤蝶",
+      "fileName": "model-1791302239670-7d6fd75d.ply",
+      "originalName": "final.ply",
+      "fileSize": 9411578,
+      "splatCount": 39873,
+      "center": [
+        1.2487787157297134,
+        2.1841490268707275,
+        1.6723985075950623
+      ],
+      "size": [
+        2.0202076137065887,
+        2.014664649963379,
+        1.1488138437271118
+      ],
+      "intro": "绿带翠凤蝶（Papilio maackii），又名深山凤蝶，为凤蝶科凤蝶属下的一种。翅黑色，满布金绿色鳞片。前翅亚缘具黄绿色横带纹。后翅外缘有6个略呈新月形的红斑，臀角红斑圆形；近亚外缘有1条明显的蓝绿色横带纹。尾突中也有l条蓝绿色线。翅反面色调较淡，后翅外缘红斑特别清晰明显，蓝绿色横带消失。展翅80—130mm，分为春、夏两型，其体型差别大，春型雌、雄蝶均略小于夏型，夏型体色鲜艳。翅黑色，布满蓝色和翠绿色鳞片。前翅亚缘具翠绿色的横带，被脉纹分成间断的条带，与后翅中部蓝色的鳞片带状纹连接；后翅表面亚外缘的红色弦月纹清楚，翅反面的金色鳞片多且散布面积宽。雄性前翅中室外侧具绒毛状性斑，易于区别。",
+      "taxonomyId": "inat-47157",
+      "storage": "oss",
+      "createdAt": "2026-10-06T15:57:19.761Z",
+      "updatedAt": "2026-10-06T15:57:44.867Z",
+      "url": "https://insect-3d-model.oss-cn-hangzhou.aliyuncs.com/models/model-1791302239670-7d6fd75d.ply",
+      "attribution": {
+        "collector": "陈隐曦",
+        "identifier": "陈隐曦",
+        "builder": "陈隐曦"
+      },
+      "attributionLog": []
+    },
+    {
+      "id": "f510ec20-3341-470e-9702-3cc6d59770ec",
+      "name": "疑步甲",
+      "fileName": "model-1791300999690-f510ec20.ply",
+      "originalName": "final.ply",
+      "fileSize": 5965270,
+      "splatCount": 25270,
+      "center": [
+        -1.8814923763275146,
+        3.1529914140701294,
+        2.168564796447754
+      ],
+      "size": [
+        2.035921573638916,
+        2.455003499984741,
+        2.0790953636169434
+      ],
+      "intro": "疑步甲（学名：Carabus elysii Thomson, 1856）是鞘翅目步甲科大步甲属昆虫，体长27～48毫米。头部及前胸背板呈红铜色，鞘翅为暗绿色且边缘带有金色细纹，表面具6行大型突起，雌虫体型通常大于雄虫。其外观与绿步甲、拉步甲极为相似，尤其是与绿步甲难以区分，分布上存在“北绿南疑”的现象。鞘翅完全愈合导致其丧失飞行能力，仅能行走。该物种为中国特有昆虫。主要分布于中国华东、华南及华中地区，在上海金山区、奉贤区春末夏初较为活跃。以蜗牛、蛞蝓等软体动物为主食，亦可摄食腐烂水果补充营养。受到威胁时会从腹部末端喷射高温混合化学物质进行防御，其分泌物具有刺激性气味和皮肤灼伤性。疑步甲以成虫越冬，冬季前在大石块下掘土室蛰伏，惊蛰后醒来捕食蜗牛，通常在四五月完成交配和繁殖。2023年，有关疑步甲对非洲大蜗牛生物防治的探索项目在福建省青少年科技创新大赛中获奖并入围全国赛。",
+      "taxonomyId": "inat-47208",
+      "storage": "oss",
+      "createdAt": "2026-10-06T15:36:39.799Z",
+      "updatedAt": "2026-10-06T15:36:57.108Z",
+      "url": "https://insect-3d-model.oss-cn-hangzhou.aliyuncs.com/models/model-1791300999690-f510ec20.ply",
+      "attribution": {
+        "collector": "陈隐曦",
+        "identifier": "陈隐曦",
+        "builder": "陈隐曦"
+      },
+      "attributionLog": []
+    },
+    {
+      "id": "5eef94af-72c7-4f89-8786-74b502171c7a",
+      "name": "红蜻雌",
+      "fileName": "model-1790340144363-5eef94af.ply",
+      "originalName": "é»è»-plus.ply",
+      "fileSize": 46994505,
+      "splatCount": 199123,
+      "center": [
+        -1.7453616261482239,
+        -0.4251641035079956,
+        6.737428426742554
+      ],
+      "size": [
+        4.455036997795105,
+        5.566233396530151,
+        4.34354829788208
+      ],
+      "intro": "猩红蜻蜓（学名：Crocothemis servilia）全身几乎为鲜红色，雌虫橙黄色。腹部背面有一微细黑色线条，翅透明，基部有些许橙色。后翅基部比前翅基部稍大，翅脉也稍有不同。休息时四翅展开，平放于两侧。稚虫短粗，具直肠鳃，无尾鳃。是中国台湾最常见的蜻蜓之一，生活于1300米以下的中低海拔地区。成虫出现月份为4-12月。成熟的雄虫藏在水域周围的枝条或草本植物上停栖占据领域。雌虫或未成熟的雄虫则经常在水域附近草丛间活动觅食。 分布于全岛中、低海拔地区，常栖息于池塘、水田、沼泽等静水域。雌虫以连续点水的方式产卵。成虫期为3 ～11月。分布于整个亚洲大陆的热带和亚热带",
+      "taxonomyId": null,
+      "storage": "oss",
+      "createdAt": "2026-09-25T12:42:26.858Z",
+      "updatedAt": "2026-10-15T13:40:23.062Z",
+      "url": "https://insect-3d-model.oss-cn-hangzhou.aliyuncs.com/models/model-1790340144363-5eef94af.ply",
+      "attribution": {
+        "collector": "陈隐曦",
+        "identifier": "陈隐曦",
+        "builder": "陈隐曦"
+      },
+      "attributionLog": []
+    },
+    {
+      "id": "4ed1bcd9-18e8-4cb7-8b55-f87172869639",
+      "name": "十星瓢萤叶甲（交配版）",
+      "fileName": "model-1790319123160-4ed1bcd9.ply",
+      "originalName": "åæç¢è«ï¼äº¤éçï¼final.ply",
+      "fileSize": 27154929,
+      "splatCount": 115057,
+      "center": [
+        3.1318080723285675,
+        -2.1584760546684265,
+        4.22221177816391
+      ],
+      "size": [
+        6.710936009883881,
+        8.314539551734924,
+        5.4124404191970825
+      ],
+      "intro": "",
+      "taxonomyId": null,
+      "storage": "oss",
+      "createdAt": "2026-09-25T06:52:04.198Z",
+      "updatedAt": "2026-10-15T13:40:29.359Z",
+      "url": "https://insect-3d-model.oss-cn-hangzhou.aliyuncs.com/models/model-1790319123160-4ed1bcd9.ply",
+      "attribution": {
+        "collector": "陈隐曦",
+        "identifier": "陈隐曦",
+        "builder": "陈隐曦"
+      },
+      "attributionLog": []
+    },
+    {
+      "id": "7a35b425-5b54-4bf6-857f-344b56f01438",
+      "name": "大蚰蜒-非昆虫",
+      "fileName": "model-1790316493671-7a35b425.ply",
+      "originalName": "è°è-éæè«--final.ply",
+      "fileSize": 29501241,
+      "splatCount": 124999,
+      "center": [
+        -6.024405539035797,
+        1.46964430809021,
+        2.006907343864441
+      ],
+      "size": [
+        8.554048418998718,
+        13.808416843414307,
+        5.886637926101685
+      ],
+      "intro": "大蚰蜒（学名：Thereuopoda clunifera）是蚰蜒科、猎足蚰属节肢动物，又称大螟蚣。身体较大，雌性长为60毫米，雄性较小，体长约43毫米。背板7块较大，背板后缘各有疣状突起。触角长度约为体长的1.5倍。全身分15节，每节有细长足一对，共有足15对。毒额很大。气门在背中央。大蚰蜒是传统中药材，经炮制后有祛风、定惊、攻毒、散结等功能。讨论用于治疗中风、惊痫、破伤风、百日咳、瘟痛、结核、症积瘤块、疮疡肿毒、风癣、白秃、烫伤等。在害虫防治中发挥着天然的作用，有助于保护环境，被认为是对人类有益的昆虫。它们的活动在调节害虫种群和维持生态系统平衡方面发挥着重要作用。",
+      "taxonomyId": "inat-49470",
+      "storage": "oss",
+      "createdAt": "2026-09-25T06:08:14.877Z",
+      "updatedAt": "2026-10-22T06:53:53.796Z",
+      "url": "https://insect-3d-model.oss-cn-hangzhou.aliyuncs.com/models/model-1790316493671-7a35b425.ply",
+      "attribution": {
+        "collector": "陈隐曦",
+        "identifier": "陈隐曦",
+        "builder": "陈隐曦"
+      },
+      "attributionLog": []
+    },
+    {
+      "id": "57bc308f-23c2-4497-99e3-bf0a77ef44e2",
+      "name": "枯叶大刀螳",
+      "fileName": "model-1790313392070-57bc308f.ply",
+      "originalName": "ä¸­åå¤§åèfinal.ply",
+      "fileSize": 30020205,
+      "splatCount": 127198,
+      "center": [
+        -3.7875295877456665,
+        -0.6890019774436951,
+        2.958185374736786
+      ],
+      "size": [
+        4.556433439254761,
+        4.256200432777405,
+        2.699074387550354
+      ],
+      "intro": "中华大刀螳体大型，体长可超过11厘米，棕色或绿色。雌性体长60-120mm，雄性体长68-87mm。头部呈三角形，复眼大而突出。前胸背板较宽，呈长菱形，前端两侧有明显齿列，前半部纵沟两侧有许多小颗粒。螳螂捕捉足的基节特别延长，股节粗壮，内侧有尖刺，胫节前端弯曲成镰刀状，内侧也有尖刺；股节和胫节折叠时夹住猎物。前足基节和腿节下部内、外缘有齿或刺。后翅略超过前翅的末端，黑褐色，前缘区为紫红色，全翅布有透明斑纹。雌虫的腹部更宽",
+      "taxonomyId": "inat-48112",
+      "storage": "oss",
+      "createdAt": "2026-09-25T05:16:33.294Z",
+      "updatedAt": "2026-10-02T15:41:17.098Z",
+      "url": "https://insect-3d-model.oss-cn-hangzhou.aliyuncs.com/models/model-1790313392070-57bc308f.ply",
+      "attribution": {
+        "collector": "陈隐曦",
+        "identifier": "陈隐曦",
+        "builder": "陈隐曦"
+      },
+      "attributionLog": []
+    },
+    {
+      "id": "3bee6a33-3d9b-4e63-9539-b51a7234efd0",
+      "name": "猩红蜻蜓",
+      "fileName": "model-1790313380575-3bee6a33.ply",
+      "originalName": "é»è»final.ply",
+      "fileSize": 47412461,
+      "splatCount": 200894,
+      "center": [
+        -1.6254994869232178,
+        -1.2226815223693848,
+        4.309070587158203
+      ],
+      "size": [
+        11.764103412628174,
+        24.96043109893799,
+        62.064788818359375
+      ],
+      "intro": "猩红蜻蜓（学名：Crocothemis servilia）全身几乎为鲜红色，雌虫橙黄色。腹部背面有一微细黑色线条，翅透明，基部有些许橙色。后翅基部比前翅基部稍大，翅脉也稍有不同。休息时四翅展开，平放于两侧。稚虫短粗，具直肠鳃，无尾鳃。是中国台湾最常见的蜻蜓之一，生活于1300米以下的中低海拔地区。成虫出现月份为4-12月。成熟的雄虫藏在水域周围的枝条或草本植物上停栖占据领域。雌虫或未成熟的雄虫则经常在水域附近草丛间活动觅食。 分布于全岛中、低海拔地区，常栖息于池塘、水田、沼泽等静水域。雌虫以连续点水的方式产卵。成虫期为3 ～11月。分布于整个亚洲大陆的热带和亚热带",
+      "taxonomyId": "inat-47792",
+      "storage": "oss",
+      "createdAt": "2026-09-25T05:16:22.600Z",
+      "updatedAt": "2026-10-02T15:37:06.752Z",
+      "url": "https://insect-3d-model.oss-cn-hangzhou.aliyuncs.com/models/model-1790313380575-3bee6a33.ply",
+      "attribution": {
+        "collector": "陈隐曦",
+        "identifier": "陈隐曦",
+        "builder": "陈隐曦"
+      },
+      "attributionLog": []
+    },
+    {
+      "id": "f34b2c94-a3f0-41d9-ac3f-54d107322e47",
+      "name": "大丽灯蛾",
+      "fileName": "model-1790313376290-f34b2c94.ply",
+      "originalName": "å¤§ä¸½ç¯è¾final.ply",
+      "fileSize": 3443064,
+      "splatCount": 14583,
+      "center": [
+        0.4039127826690674,
+        2.957986831665039,
+        -2.070513606071472
+      ],
+      "size": [
+        4.565914154052734,
+        7.914432525634766,
+        9.13870644569397
+      ],
+      "intro": "丽灯蛾（学名：Aglaomorpha histrio Walker, 1855）是鳞翅目灯蛾科Aglaomorpha属昆虫，翅展66-100毫米。其头部、胸部及腹部呈橙色并分布黑色斑纹，头顶中央具小黑斑，胸部有闪光黑色纵斑，腹部各节具特征性黑斑排列；前翅为闪光黑色，前缘区有4个黄白斑，翅面散布黄白色斑块；后翅橙色，具黑色带状纹路及斑点。该物种分布于中国江苏、浙江、湖北、江西、湖南、福建、台湾、四川、云南等地。成虫多活动于低中海拔山区，非冬季时段可见，日间有访花习性，夜间具趋光性。现存种群为自然野生状态，尚未进行人工开发利用。",
+      "taxonomyId": "inat-47157",
+      "storage": "oss",
+      "createdAt": "2026-09-25T05:16:16.359Z",
+      "updatedAt": "2026-10-02T15:35:38.512Z",
+      "url": "https://insect-3d-model.oss-cn-hangzhou.aliyuncs.com/models/model-1790313376290-f34b2c94.ply",
+      "attribution": {
+        "collector": "陈隐曦",
+        "identifier": "陈隐曦",
+        "builder": "陈隐曦"
+      },
+      "attributionLog": []
+    }
+  ]
 }

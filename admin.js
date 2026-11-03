@@ -1,4 +1,53 @@
-import { createIcons, icons } from 'lucide';
+import replaceElement from './node_modules/lucide/dist/esm/replaceElement.mjs';
+import ArrowLeft from './node_modules/lucide/dist/esm/icons/arrow-left.mjs';
+import ArrowRight from './node_modules/lucide/dist/esm/icons/arrow-right.mjs';
+import ChevronDown from './node_modules/lucide/dist/esm/icons/chevron-down.mjs';
+import ChevronRight from './node_modules/lucide/dist/esm/icons/chevron-right.mjs';
+import CornerDownRight from './node_modules/lucide/dist/esm/icons/corner-down-right.mjs';
+import FolderCog from './node_modules/lucide/dist/esm/icons/folder-cog.mjs';
+import ImagePlus from './node_modules/lucide/dist/esm/icons/image-plus.mjs';
+import Inbox from './node_modules/lucide/dist/esm/icons/inbox.mjs';
+import KeyRound from './node_modules/lucide/dist/esm/icons/key-round.mjs';
+import Lock from './node_modules/lucide/dist/esm/icons/lock.mjs';
+import LockKeyhole from './node_modules/lucide/dist/esm/icons/lock-keyhole.mjs';
+import Minus from './node_modules/lucide/dist/esm/icons/minus.mjs';
+import Pencil from './node_modules/lucide/dist/esm/icons/pencil.mjs';
+import Plus from './node_modules/lucide/dist/esm/icons/plus.mjs';
+import Save from './node_modules/lucide/dist/esm/icons/save.mjs';
+import ToggleLeft from './node_modules/lucide/dist/esm/icons/toggle-left.mjs';
+import ToggleRight from './node_modules/lucide/dist/esm/icons/toggle-right.mjs';
+import Trash2 from './node_modules/lucide/dist/esm/icons/trash.mjs';
+import UploadCloud from './node_modules/lucide/dist/esm/icons/cloud-upload.mjs';
+import X from './node_modules/lucide/dist/esm/icons/x.mjs';
+
+const icons = {
+  ArrowLeft,
+  ArrowRight,
+  ChevronDown,
+  ChevronRight,
+  CornerDownRight,
+  FolderCog,
+  ImagePlus,
+  Inbox,
+  KeyRound,
+  Lock,
+  LockKeyhole,
+  Minus,
+  Pencil,
+  Plus,
+  Save,
+  ToggleLeft,
+  ToggleRight,
+  Trash2,
+  UploadCloud,
+  X
+};
+
+function createIcons({ root = document } = {}) {
+  root.querySelectorAll('[data-lucide]').forEach((element) => {
+    replaceElement(element, { nameAttr: 'data-lucide', icons, attrs: {} });
+  });
+}
 
 const modelList = document.getElementById('model-list');
 const emptyState = document.getElementById('empty-state');
@@ -9,10 +58,7 @@ const listHint = document.getElementById('list-hint');
 const uploadZone = document.getElementById('upload-zone');
 const fileInput = document.getElementById('file-input');
 const uploadForm = document.getElementById('upload-form');
-const uploadProgress = document.getElementById('upload-progress');
-const uploadProgressName = document.getElementById('upload-progress-name');
-const uploadProgressPercent = document.getElementById('upload-progress-percent');
-const uploadProgressFill = document.getElementById('upload-progress-fill');
+const uploadTasks = document.getElementById('upload-tasks');
 const authGate = document.getElementById('auth-gate');
 const uploadSection = document.getElementById('upload-section');
 const unlockForm = document.getElementById('unlock-form');
@@ -22,20 +68,47 @@ const toast = document.getElementById('toast');
 const addTaxonomyButton = document.getElementById('add-taxonomy-button');
 const taxonomyEditor = document.getElementById('taxonomy-editor');
 const taxonomyNameInput = document.getElementById('taxonomy-name');
+const taxonomyCodeInput = document.getElementById('taxonomy-code');
 const taxonomyRankInput = document.getElementById('taxonomy-rank');
 const taxonomyParentInput = document.getElementById('taxonomy-parent');
 const taxonomySortInput = document.getElementById('taxonomy-sort');
 const taxonomyKeyTextInput = document.getElementById('taxonomy-key-text');
+const taxonomyNameLatinInput = document.getElementById('taxonomy-name-latin');
+const taxonomyActiveInput = document.getElementById('taxonomy-active');
+const taxonomyStatusInput = document.getElementById('taxonomy-status');
+const taxonomyBasisInput = document.getElementById('taxonomy-basis');
+const taxonomyIntroInput = document.getElementById('taxonomy-intro');
 const taxonomySaveButton = document.getElementById('taxonomy-save');
 const taxonomyCancelButton = document.getElementById('taxonomy-cancel');
 const taxonomyList = document.getElementById('taxonomy-list');
 const taxonomyHint = document.getElementById('taxonomy-hint');
+const addRankButton = document.getElementById('add-rank-button');
+const rankEditor = document.getElementById('rank-editor');
+const rankKeyInput = document.getElementById('rank-key');
+const rankNameInput = document.getElementById('rank-name');
+const rankNameLatinInput = document.getElementById('rank-name-latin');
+const rankPositionInput = document.getElementById('rank-position');
+const rankBaseInput = document.getElementById('rank-base');
+const rankParentIdInput = document.getElementById('rank-parent-id');
+const rankSaveButton = document.getElementById('rank-save');
+const rankCancelButton = document.getElementById('rank-cancel');
+const rankList = document.getElementById('rank-list');
+const rankTree = document.getElementById('rank-tree');
+const rankCatalogHint = document.getElementById('rank-catalog-hint');
+const tabRankBtn = document.getElementById('tab-rank-btn');
+const tabFillBtn = document.getElementById('tab-fill-btn');
+const tabModelsBtn = document.getElementById('tab-models-btn');
 
 let models = [];
 let taxonomy = [];
+let rankCatalog = [];
 let unlocked = false;
 let adminKey = '';
 let editingTaxonomyId = null;
+let editingRankKey = null;
+let activeTab = 'models';
+const expandedTaxonomyAdminIds = new Set(['taxon-animalia', 'taxon-arthropoda']);
+const expandedRankTreeIds = new Set(['taxon-animalia', 'taxon-arthropoda', 'taxon-insecta']);
 
 createIcons({ icons });
 
@@ -46,6 +119,12 @@ const dateFormatter = new Intl.DateTimeFormat('zh-CN', {
   hour: '2-digit',
   minute: '2-digit'
 });
+
+const ATTRIBUTION_FIELDS = {
+  collector: '采集者',
+  identifier: '鉴定者',
+  builder: '模型构建者'
+};
 
 function formatBytes(bytes) {
   if (!Number.isFinite(bytes) || bytes <= 0) return '0 B';
@@ -71,14 +150,46 @@ function readStoredAuth() {
   if (!adminKey) unlocked = false;
 }
 
+function applyTabVisibility() {
+  const showModels = activeTab === 'models';
+  const showRank = activeTab === 'rank';
+  const showFill = activeTab === 'fill';
+
+  document.querySelectorAll('section[data-tab="models"]').forEach((el) => {
+    el.hidden = el === uploadSection ? !unlocked || !showModels : !showModels;
+  });
+  document.querySelectorAll('section[data-tab="rank"]').forEach((el) => {
+    el.hidden = !showRank;
+  });
+  document.querySelectorAll('section[data-tab="fill"]').forEach((el) => {
+    el.hidden = !showFill;
+  });
+
+  const tabButtons = [
+    ['models', tabModelsBtn],
+    ['rank', tabRankBtn],
+    ['fill', tabFillBtn]
+  ];
+  for (const [key, btn] of tabButtons) {
+    const active = activeTab === key;
+    btn.classList.toggle('is-active', active);
+    btn.setAttribute('aria-selected', String(active));
+  }
+}
+
 function renderAuthState() {
   authGate.hidden = unlocked;
-  uploadSection.hidden = !unlocked;
+  applyTabVisibility();
   lockButton.hidden = !unlocked;
-  addTaxonomyButton.disabled = !unlocked;
+  addTaxonomyButton.hidden = true;
+  taxonomyEditor.hidden = true;
+  addRankButton.disabled = !unlocked;
   if (!unlocked && !taxonomyEditor.hidden) closeTaxonomyEditor();
+  if (!unlocked && !rankEditor.hidden) closeRankEditor();
   renderModelRows();
   renderTaxonomyList();
+  renderRankList();
+  renderRankTree();
 }
 
 function requireUnlocked() {
@@ -99,11 +210,59 @@ function authHeaders(contentType = false) {
   return headers;
 }
 
-function setUploadProgress(name, percent) {
-  uploadProgress.hidden = false;
-  uploadProgressName.textContent = name;
-  uploadProgressPercent.textContent = `${Math.round(percent)}%`;
-  uploadProgressFill.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+const SUPPORTED_MODEL_EXTENSIONS = ['.ply', '.spz', '.splat', '.ksplat'];
+const SUPPORTED_THUMBNAIL_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp'];
+
+function fileExtension(name) {
+  const dot = name.lastIndexOf('.');
+  return dot >= 0 ? name.slice(dot).toLowerCase() : '';
+}
+
+function createUploadTask(file) {
+  const row = document.createElement('div');
+  row.className = 'upload-task';
+
+  const copy = document.createElement('div');
+  copy.className = 'upload-task-copy';
+
+  const name = document.createElement('span');
+  name.className = 'upload-task-name';
+  name.textContent = file.name;
+
+  const status = document.createElement('span');
+  status.className = 'upload-task-status';
+  status.textContent = '等待中';
+
+  copy.append(name, status);
+
+  const bar = document.createElement('div');
+  bar.className = 'progress-line';
+  const fill = document.createElement('div');
+  fill.className = 'progress-line-fill';
+  bar.append(fill);
+
+  row.append(copy, bar);
+  uploadTasks.append(row);
+
+  return {
+    setStatus(text) {
+      status.textContent = text;
+    },
+    setProgress(percent) {
+      const pct = Math.max(0, Math.min(100, percent));
+      fill.style.width = `${pct}%`;
+      status.textContent = `上传中 ${Math.round(pct)}%`;
+    },
+    setDone() {
+      fill.style.width = '100%';
+      status.textContent = '完成';
+      status.classList.add('is-done');
+    },
+    setError(message) {
+      status.textContent = message || '失败';
+      status.classList.add('is-error');
+    }
+  };
 }
 
 function updateSummary() {
@@ -119,12 +278,10 @@ function createIcon(name) {
   return wrapper;
 }
 
-const taxonomyRankLabels = {
-  order: '目',
-  family: '科',
-  genus: '属',
-  species: '种'
-};
+function getRankLabel(rankKey) {
+  const rank = rankCatalog.find((entry) => entry.key === rankKey);
+  return rank ? rank.name : rankKey;
+}
 
 function sortedTaxonomy(parentId) {
   return taxonomy
@@ -132,8 +289,398 @@ function sortedTaxonomy(parentId) {
     .sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
 }
 
+function getSpecialRankPlaceholders(parentEntry) {
+  const parentPosition = Number(parentEntry.rankPosition) || 0;
+  const childRankKeys = new Set(sortedTaxonomy(parentEntry.id).map((entry) => entry.rankKey || entry.rank));
+
+  return rankCatalog
+    .filter((rank) => {
+      if (rank.base || rank.active === false) return false;
+      const position = Number(rank.position);
+      if (!Number.isFinite(position) || position <= parentPosition) return false;
+      if (childRankKeys.has(rank.key)) return false;
+
+      const nextBasePosition = rankCatalog
+        .filter((item) => item.base && Number(item.position) > parentPosition)
+        .sort((a, b) => Number(a.position) - Number(b.position))[0]?.position;
+
+      return nextBasePosition === undefined || position < Number(nextBasePosition);
+    })
+    .sort((a, b) => Number(a.position) - Number(b.position));
+}
+
+function getImmediateChildRanks(parentEntry) {
+  const parentPosition = Number(parentEntry.rankPosition) || 0;
+  const childRankKeys = new Set(sortedTaxonomy(parentEntry.id).map((entry) => entry.rankKey || entry.rank));
+  const nextBase = rankCatalog
+    .filter((rank) => rank.base && Number(rank.position) > parentPosition)
+    .sort((a, b) => Number(a.position) - Number(b.position))[0];
+  if (!nextBase) return [];
+  const limit = Number(nextBase.position);
+  return rankCatalog
+    .filter((rank) => {
+      const position = Number(rank.position);
+      return position > parentPosition && position <= limit && !childRankKeys.has(rank.key);
+    })
+    .sort((a, b) => Number(a.position) - Number(b.position));
+}
+
+function getNextRankForAdd(parentEntry) {
+  const parentPosition = Number(parentEntry.rankPosition) || 0;
+  const nextBase = rankCatalog
+    .filter((rank) => rank.base && Number(rank.position) > parentPosition)
+    .sort((a, b) => Number(a.position) - Number(b.position))[0];
+  if (!nextBase) return null;
+  const limit = Number(nextBase.position);
+  return rankCatalog
+    .filter((rank) => Number(rank.position) > parentPosition && Number(rank.position) <= limit)
+    .sort((a, b) => Number(a.position) - Number(b.position))[0] || null;
+}
+
 function getTaxonomyEntry(id) {
   return taxonomy.find((entry) => entry.id === id) || null;
+}
+
+function renderRankOptions(selected = '') {
+  taxonomyRankInput.innerHTML = '';
+  for (const rank of rankCatalog) {
+    if (rank.active === false) continue;
+    const option = document.createElement('option');
+    option.value = rank.key;
+    option.textContent = `${rank.name}${rank.nameLatin ? ' · ' + rank.nameLatin : ''}`;
+    if (rank.key === selected) option.selected = true;
+    taxonomyRankInput.append(option);
+  }
+}
+
+function renderRankList() {
+  rankList.innerHTML = '';
+  rankCatalogHint.textContent = rankCatalog.length ? `${rankCatalog.length} 个阶元` : '';
+
+  function createRankRow(rank, depth) {
+    const row = document.createElement('article');
+    row.className = 'rank-row';
+    row.dataset.key = rank.key;
+    row.style.setProperty('--rank-depth', depth);
+
+    const badge = document.createElement('span');
+    badge.className = 'rank-badge';
+    badge.textContent = rank.base ? '基础' : '特殊';
+
+    const main = document.createElement('div');
+    main.className = 'rank-row-main';
+    const name = document.createElement('strong');
+    name.textContent = `${rank.name}${rank.nameLatin ? ' · ' + rank.nameLatin : ''}`;
+    const meta = document.createElement('small');
+    meta.textContent = `key: ${rank.key} · 坐标: ${rank.position} · ${rank.active ? '启用' : '停用'}`;
+    main.append(name, meta);
+
+    const actions = document.createElement('div');
+    actions.className = 'model-actions';
+
+    const editButton = document.createElement('button');
+    editButton.className = 'action-button';
+    editButton.type = 'button';
+    editButton.disabled = !unlocked;
+    editButton.setAttribute('aria-label', '编辑阶元');
+    editButton.append(createIcon('pencil'));
+    editButton.addEventListener('click', () => openRankEditor(rank));
+
+    const toggleButton = document.createElement('button');
+    toggleButton.className = 'action-button';
+    toggleButton.type = 'button';
+    toggleButton.disabled = !unlocked;
+    toggleButton.setAttribute('aria-label', rank.active ? '停用阶元' : '启用阶元');
+    toggleButton.append(createIcon(rank.active ? 'toggle-left' : 'toggle-right'));
+    toggleButton.addEventListener('click', () => toggleRank(rank));
+
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'action-button delete rank-delete-button';
+    deleteButton.type = 'button';
+    deleteButton.disabled = !unlocked;
+    deleteButton.setAttribute('aria-label', '删除阶元');
+    deleteButton.append(createIcon('trash-2'));
+    const deleteText = document.createElement('span');
+    deleteText.textContent = '删除';
+    deleteButton.append(deleteText);
+    deleteButton.addEventListener('click', () => deleteRank(rank));
+
+    actions.append(editButton, toggleButton, deleteButton);
+
+    row.append(badge, main, actions);
+    rankList.append(row);
+  }
+
+  const bases = rankCatalog
+    .filter((rank) => rank.base)
+    .sort((a, b) => Number(a.position) - Number(b.position));
+  const specials = rankCatalog
+    .filter((rank) => !rank.base)
+    .sort((a, b) => Number(a.position) - Number(b.position));
+
+  bases.forEach((base, index) => {
+    createRankRow(base, 0);
+    const nextPosition = bases[index + 1] ? Number(bases[index + 1].position) : Infinity;
+    for (const special of specials) {
+      const position = Number(special.position);
+      if (position > Number(base.position) && position < nextPosition) {
+        createRankRow(special, 1);
+      }
+    }
+  });
+
+  createIcons({ icons });
+}
+
+function renderRankTree() {
+  rankTree.innerHTML = '';
+
+  function appendEntry(entry, depth) {
+    const children = sortedTaxonomy(entry.id);
+    const placeholderRanks = getImmediateChildRanks(entry);
+    const nextRank = getNextRankForAdd(entry);
+    const expanded = expandedRankTreeIds.has(entry.id);
+    const row = document.createElement('article');
+    row.className = 'rank-row';
+    row.dataset.id = entry.id;
+    row.style.setProperty('--rank-depth', depth);
+
+    const lead = document.createElement('div');
+    lead.className = 'taxonomy-row-lead';
+
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'taxonomy-toggle';
+    toggle.disabled = children.length === 0 && placeholderRanks.length === 0;
+    toggle.setAttribute('aria-label', expanded ? '收起下级' : '展开下级');
+    toggle.append(createIcon((children.length || placeholderRanks.length) ? (expanded ? 'chevron-down' : 'chevron-right') : 'minus'));
+    toggle.addEventListener('click', () => {
+      if (expanded) {
+        expandedRankTreeIds.delete(entry.id);
+      } else {
+        expandedRankTreeIds.add(entry.id);
+      }
+      renderRankTree();
+    });
+
+    const badge = document.createElement('span');
+    badge.className = 'rank-badge';
+    badge.textContent = getRankLabel(entry.rankKey || entry.rank);
+    lead.append(toggle, badge);
+
+    const main = document.createElement('div');
+    main.className = 'rank-row-main';
+    const name = document.createElement('strong');
+    name.textContent = `${entry.name}${entry.nameLatin ? ' · ' + entry.nameLatin : ''}`;
+    const meta = document.createElement('small');
+    meta.textContent = `坐标: ${entry.code || '未生成'} · 阶元坐标: ${entry.rankPosition}${entry.needsChineseName ? ' · 待补中文名' : ''}`;
+    main.append(name, meta);
+
+    const actions = document.createElement('div');
+    actions.className = 'model-actions';
+
+    if (nextRank) {
+      const addButton = document.createElement('button');
+      addButton.className = 'action-button rank-add-button';
+      addButton.type = 'button';
+      addButton.disabled = !unlocked;
+      addButton.setAttribute('aria-label', '增添下一级阶元');
+      addButton.append(createIcon('plus'));
+      const addText = document.createElement('span');
+      addText.textContent = '增添';
+      addButton.append(addText);
+      addButton.addEventListener('click', () => addChildToNode(entry, nextRank));
+      actions.append(addButton);
+    }
+
+    const placeButton = document.createElement('button');
+    placeButton.className = 'action-button';
+    placeButton.type = 'button';
+    placeButton.disabled = !unlocked;
+    placeButton.setAttribute('aria-label', '放置特殊阶元到此节点');
+    placeButton.append(createIcon('corner-down-right'));
+    placeButton.addEventListener('click', () => {
+      rankParentIdInput.value = entry.id;
+      openRankEditor();
+    });
+    actions.append(placeButton);
+
+    row.append(lead, main, actions);
+    rankTree.append(row);
+
+    if (children.length && expanded) {
+      for (const child of children) {
+        appendEntry(child, depth + 1);
+      }
+    }
+
+    if (expanded) {
+      for (const rank of placeholderRanks) {
+        const placeholder = document.createElement('article');
+        placeholder.className = 'rank-row rank-placeholder';
+        placeholder.style.setProperty('--rank-depth', depth + 1);
+
+        const lead = document.createElement('div');
+        lead.className = 'taxonomy-row-lead';
+        const badge = document.createElement('span');
+        badge.className = 'rank-badge';
+        badge.textContent = rank.name;
+        lead.append(badge);
+
+        const main = document.createElement('div');
+        main.className = 'rank-row-main';
+        const name = document.createElement('strong');
+        name.textContent = `未建立：${rank.name}`;
+        const meta = document.createElement('small');
+        meta.textContent = `坐标: ${rank.position}`;
+        main.append(name, meta);
+
+        const actions = document.createElement('div');
+        actions.className = 'model-actions';
+        const addButton = document.createElement('button');
+        addButton.className = 'action-button';
+        addButton.type = 'button';
+        addButton.disabled = !unlocked;
+        addButton.setAttribute('aria-label', `新增${rank.name}`);
+        addButton.append(createIcon('plus'));
+        addButton.addEventListener('click', () => addRankPlaceholder(entry, rank));
+        actions.append(addButton);
+
+        placeholder.append(lead, main, actions);
+        rankTree.append(placeholder);
+      }
+    }
+  }
+
+  for (const entry of sortedTaxonomy(null)) {
+    appendEntry(entry, 0);
+  }
+
+  createIcons({ icons });
+}
+
+function openRankEditor(rank = null) {
+  editingRankKey = rank?.key || null;
+  rankKeyInput.value = rank?.key || '';
+  rankNameInput.value = rank?.name || '';
+  rankNameLatinInput.value = rank?.nameLatin || '';
+  rankPositionInput.value = rank?.position || '';
+  rankBaseInput.value = String(rank?.base || false);
+  rankKeyInput.disabled = Boolean(rank);
+  rankEditor.hidden = false;
+  rankNameInput.focus();
+}
+
+function closeRankEditor() {
+  editingRankKey = null;
+  rankEditor.hidden = true;
+  rankKeyInput.value = '';
+  rankNameInput.value = '';
+  rankNameLatinInput.value = '';
+  rankPositionInput.value = '';
+  rankBaseInput.value = 'false';
+  rankParentIdInput.value = '';
+  rankKeyInput.disabled = false;
+}
+
+async function saveRank() {
+  if (!requireUnlocked()) return;
+  const payload = {
+    key: rankKeyInput.value.trim(),
+    name: rankNameInput.value.trim(),
+    nameLatin: rankNameLatinInput.value.trim(),
+    position: Number(rankPositionInput.value),
+    base: rankBaseInput.value === 'true'
+  };
+  if (!payload.key || !payload.name || !Number.isFinite(payload.position)) {
+    showToast('请完整填写阶元 key、名称和坐标', true);
+    return;
+  }
+
+  const url = editingRankKey
+    ? `/api/rank-catalog/${encodeURIComponent(editingRankKey)}`
+    : '/api/rank-catalog';
+  const method = editingRankKey ? 'PATCH' : 'POST';
+
+  try {
+    const response = await fetch(url, {
+      method,
+      headers: authHeaders(true),
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || '保存阶元失败');
+    }
+
+    if (!editingRankKey && rankParentIdInput.value) {
+      const taxonomyResponse = await fetch('/api/taxonomy', {
+        method: 'POST',
+        headers: authHeaders(true),
+        body: JSON.stringify({
+          name: rankNameInput.value.trim(),
+          rankKey: rankKeyInput.value.trim(),
+          nameLatin: rankNameLatinInput.value.trim(),
+          parentId: rankParentIdInput.value,
+          identificationSummary: '',
+          classificationBasis: '',
+          intro: '',
+          active: true,
+          classificationStatus: 'confirmed'
+        })
+      });
+      if (!taxonomyResponse.ok) {
+        const data = await taxonomyResponse.json();
+        throw new Error(data.error || '创建分类节点失败');
+      }
+    }
+
+    await loadTaxonomy();
+    closeRankEditor();
+    showToast('阶元已保存');
+  } catch (error) {
+    showToast(error.message || '保存失败', true);
+  }
+}
+
+async function toggleRank(rank) {
+  if (!requireUnlocked()) return;
+  try {
+    const response = await fetch(`/api/rank-catalog/${encodeURIComponent(rank.key)}`, {
+      method: 'PATCH',
+      headers: authHeaders(true),
+      body: JSON.stringify({ active: !rank.active })
+    });
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || '更新阶元失败');
+    }
+    await loadTaxonomy();
+    showToast(rank.active ? '阶元已停用' : '阶元已启用');
+  } catch (error) {
+    showToast(error.message || '更新失败', true);
+  }
+}
+
+async function deleteRank(rank) {
+  if (!requireUnlocked()) return;
+  if (!window.confirm(`确定删除特殊阶元“${rank.name}”吗？`)) return;
+
+  try {
+    const response = await fetch(`/api/rank-catalog/${encodeURIComponent(rank.key)}`, {
+      method: 'DELETE',
+      headers: authHeaders()
+    });
+    if (!response.ok) {
+      const data = await response.json();
+      const message = data.error || '删除阶元失败';
+      throw new Error(message);
+    }
+    await loadTaxonomy();
+    showToast('特殊阶元已删除');
+  } catch (error) {
+    showToast(error.message || '删除失败', true);
+  }
 }
 
 function renderParentOptions(selectedId = '', excludedId = null) {
@@ -148,7 +695,7 @@ function renderParentOptions(selectedId = '', excludedId = null) {
       if (entry.id === excludedId) continue;
       const option = document.createElement('option');
       option.value = entry.id;
-      option.textContent = `${'　'.repeat(depth)}${entry.name}（${taxonomyRankLabels[entry.rank] || entry.rank}）`;
+      option.textContent = `${'　'.repeat(depth)}${entry.name}（${getRankLabel(entry.rankKey || entry.rank)}）`;
       option.disabled = entry.id === excludedId;
       if (entry.id === selectedId) option.selected = true;
       taxonomyParentInput.append(option);
@@ -171,9 +718,16 @@ function flattenTaxonomy(parentId = null, depth = 0) {
 function openTaxonomyEditor(entry = null) {
   editingTaxonomyId = entry?.id || null;
   taxonomyNameInput.value = entry?.name || '';
-  taxonomyRankInput.value = entry?.rank || 'order';
+  taxonomyCodeInput.value = entry?.code || '';
+  taxonomyRankInput.value = entry?.rankKey || entry?.rank || 'order';
+  taxonomyNameLatinInput.value = entry?.nameLatin || '';
+  taxonomyActiveInput.value = String(entry?.active !== false);
+  taxonomyStatusInput.value = entry?.classificationStatus || 'confirmed';
   taxonomySortInput.value = entry?.sortOrder || '';
-  taxonomyKeyTextInput.value = entry?.keyText || '';
+  taxonomyKeyTextInput.value = entry?.identificationSummary || entry?.keyText || '';
+  taxonomyBasisInput.value = entry?.classificationBasis || '';
+  taxonomyIntroInput.value = entry?.intro || '';
+  renderRankOptions(taxonomyRankInput.value);
   renderParentOptions(entry?.parentId || '', entry?.id || null);
   taxonomyEditor.hidden = false;
   taxonomyNameInput.focus();
@@ -183,25 +737,105 @@ function closeTaxonomyEditor() {
   editingTaxonomyId = null;
   taxonomyEditor.hidden = true;
   taxonomyNameInput.value = '';
-  taxonomyRankInput.value = 'order';
+  taxonomyCodeInput.value = '';
+  taxonomyNameLatinInput.value = '';
+  taxonomyActiveInput.value = 'true';
+  taxonomyStatusInput.value = 'confirmed';
   taxonomySortInput.value = '';
   taxonomyKeyTextInput.value = '';
+  taxonomyBasisInput.value = '';
+  taxonomyIntroInput.value = '';
+  renderRankOptions('');
   renderParentOptions('');
+}
+
+function addRankPlaceholder(parentEntry, rank) {
+  activeTab = 'fill';
+  applyTabVisibility();
+  openTaxonomyEditor();
+  taxonomyRankInput.value = rank.key;
+  taxonomyParentInput.value = parentEntry.id;
+  taxonomyNameInput.value = '';
+}
+
+function addChildToNode(parentEntry, rank) {
+  activeTab = 'fill';
+  applyTabVisibility();
+  openTaxonomyEditor();
+  taxonomyRankInput.value = rank.key;
+  taxonomyParentInput.value = parentEntry.id;
+  taxonomyNameInput.value = '';
+  taxonomyCodeInput.value = '';
+}
+
+function createRankPlaceholderRow(parentEntry, rank, depth) {
+  const row = document.createElement('article');
+  row.className = 'taxonomy-row taxonomy-placeholder';
+  row.style.setProperty('--taxonomy-depth', depth);
+
+  const lead = document.createElement('div');
+  lead.className = 'taxonomy-row-lead';
+  const badge = document.createElement('span');
+  badge.className = 'taxonomy-rank-badge';
+  badge.textContent = rank.name;
+  lead.append(badge);
+
+  const main = document.createElement('div');
+  main.className = 'taxonomy-row-main';
+  const text = document.createElement('div');
+  text.className = 'taxonomy-placeholder-text';
+  text.textContent = `新增 ${rank.name}`;
+  main.append(text);
+
+  const actions = document.createElement('div');
+  actions.className = 'model-actions';
+  const addButton = document.createElement('button');
+  addButton.className = 'action-button';
+  addButton.type = 'button';
+  addButton.disabled = !unlocked;
+  addButton.setAttribute('aria-label', `新增${rank.name}`);
+  addButton.append(createIcon('plus'));
+  addButton.addEventListener('click', () => addRankPlaceholder(parentEntry, rank));
+  actions.append(addButton);
+
+  row.append(lead, main, document.createElement('div'), actions);
+  taxonomyList.append(row);
 }
 
 function renderTaxonomyList() {
   taxonomyList.innerHTML = '';
   taxonomyHint.textContent = taxonomy.length ? `${taxonomy.length} 个条目` : '';
 
-  for (const { entry, depth } of flattenTaxonomy()) {
+  function createTaxonomyRow(entry, depth) {
+    const children = sortedTaxonomy(entry.id);
+    const expanded = expandedTaxonomyAdminIds.has(entry.id);
     const row = document.createElement('article');
     row.className = 'taxonomy-row';
     row.dataset.id = entry.id;
     row.style.setProperty('--taxonomy-depth', depth);
 
+    const lead = document.createElement('div');
+    lead.className = 'taxonomy-row-lead';
+
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'taxonomy-toggle';
+    toggle.disabled = children.length === 0;
+    toggle.setAttribute('aria-label', expanded ? '收起下级分类' : '展开下级分类');
+    toggle.append(createIcon(children.length ? (expanded ? 'chevron-down' : 'chevron-right') : 'minus'));
+    toggle.addEventListener('click', () => {
+      if (expanded) {
+        expandedTaxonomyAdminIds.delete(entry.id);
+      } else {
+        expandedTaxonomyAdminIds.add(entry.id);
+      }
+      renderTaxonomyList();
+    });
+
     const rank = document.createElement('span');
     rank.className = 'taxonomy-rank-badge';
-    rank.textContent = taxonomyRankLabels[entry.rank] || entry.rank;
+    rank.textContent = getRankLabel(entry.rankKey || entry.rank);
+    lead.append(toggle, rank);
 
     const main = document.createElement('div');
     main.className = 'taxonomy-row-main';
@@ -212,15 +846,19 @@ function renderTaxonomyList() {
     nameInput.disabled = !unlocked;
     nameInput.setAttribute('aria-label', '分类名称');
 
+    const codeLabel = document.createElement('div');
+    codeLabel.className = 'taxonomy-code';
+    codeLabel.textContent = entry.code || '未生成坐标';
+
     const keyInput = document.createElement('textarea');
     keyInput.className = 'taxonomy-key-input';
-    keyInput.value = entry.keyText || '';
+    keyInput.value = entry.identificationSummary || entry.keyText || '';
     keyInput.rows = 2;
-    keyInput.placeholder = '检索特征（可选）';
+    keyInput.placeholder = '鉴定特征摘要（可选）';
     keyInput.disabled = !unlocked;
-    keyInput.setAttribute('aria-label', '检索特征');
+    keyInput.setAttribute('aria-label', '鉴定特征摘要');
 
-    main.append(nameInput, keyInput);
+    main.append(nameInput, codeLabel, keyInput);
 
     const meta = document.createElement('div');
     meta.className = 'taxonomy-row-meta';
@@ -229,23 +867,14 @@ function renderTaxonomyList() {
     const actions = document.createElement('div');
     actions.className = 'model-actions';
 
-    const saveButton = document.createElement('button');
-    saveButton.className = 'action-button';
-    saveButton.type = 'button';
-    saveButton.setAttribute('aria-label', '保存分类');
-    saveButton.disabled = !unlocked;
-    saveButton.append(createIcon('save'));
-    saveButton.addEventListener('click', () => saveTaxonomyRow(entry.id, nameInput, keyInput));
-
     const deleteButton = document.createElement('button');
     deleteButton.className = 'action-button delete';
     deleteButton.type = 'button';
-    deleteButton.setAttribute('aria-label', '删除分类');
     deleteButton.disabled = !unlocked;
+    deleteButton.setAttribute('aria-label', '删除分类节点');
     deleteButton.append(createIcon('trash-2'));
     deleteButton.addEventListener('click', () => deleteTaxonomy(entry));
-
-    actions.append(saveButton, deleteButton);
+    actions.append(deleteButton);
 
     const assignWrap = document.createElement('div');
     assignWrap.className = 'taxonomy-assign';
@@ -275,8 +904,24 @@ function renderTaxonomyList() {
     assignButton.addEventListener('click', () => assignModelToTaxonomy(entry.id, assignSelect));
 
     assignWrap.append(assignSelect, assignButton);
-    row.append(rank, main, meta, actions, assignWrap);
+    row.append(lead, main, meta, actions, assignWrap);
     taxonomyList.append(row);
+
+    if (children.length && expanded) {
+      for (const child of children) {
+        createTaxonomyRow(child, depth + 1);
+      }
+    }
+
+    if (expanded) {
+      for (const rank of getSpecialRankPlaceholders(entry)) {
+        createRankPlaceholderRow(entry, rank, depth + 1);
+      }
+    }
+  }
+
+  for (const entry of sortedTaxonomy(null)) {
+    createTaxonomyRow(entry, 0);
   }
 
   createIcons({ icons });
@@ -303,13 +948,56 @@ function renderModelRows() {
 
     const main = document.createElement('div');
     main.className = 'model-row-main';
+    const attrInputs = {};
 
     const nameRow = document.createElement('div');
     nameRow.className = 'model-name-row';
 
-    const fileIcon = document.createElement('span');
-    fileIcon.className = 'model-file-icon';
-    fileIcon.append(createIcon('file-box'));
+    const thumbnailPanel = document.createElement('div');
+    thumbnailPanel.className = 'model-thumbnail-panel';
+    const thumbnailImage = document.createElement('img');
+    thumbnailImage.className = 'model-thumbnail-image';
+    thumbnailImage.crossOrigin = 'anonymous';
+    thumbnailImage.src = model.thumbnail || '/thumbs/placeholder.svg';
+    thumbnailImage.alt = `${model.name} 缩略图`;
+    thumbnailImage.loading = 'lazy';
+    thumbnailImage.addEventListener('error', () => {
+      thumbnailImage.src = '/thumbs/placeholder.svg';
+    }, { once: true });
+
+    const thumbnailTools = document.createElement('div');
+    thumbnailTools.className = 'model-thumbnail-tools';
+    const thumbnailInput = document.createElement('input');
+    thumbnailInput.type = 'file';
+    thumbnailInput.accept = '.jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp';
+    thumbnailInput.hidden = true;
+    const thumbnailButton = document.createElement('button');
+    thumbnailButton.className = 'model-thumbnail-button';
+    thumbnailButton.type = 'button';
+    thumbnailButton.disabled = !unlocked;
+    thumbnailButton.append(createIcon('image-plus'));
+    const thumbnailButtonLabel = document.createElement('span');
+    thumbnailButtonLabel.textContent = model.thumbnailFileName ? '更换' : '添加';
+    thumbnailButton.append(thumbnailButtonLabel);
+    thumbnailButton.addEventListener('click', () => {
+      if (requireUnlocked()) thumbnailInput.click();
+    });
+    thumbnailInput.addEventListener('change', () => {
+      const file = thumbnailInput.files?.[0];
+      thumbnailInput.value = '';
+      if (file) uploadModelThumbnail(model, file, thumbnailButton, thumbnailButtonLabel);
+    });
+
+    const thumbnailClearButton = document.createElement('button');
+    thumbnailClearButton.className = 'model-thumbnail-clear';
+    thumbnailClearButton.type = 'button';
+    thumbnailClearButton.textContent = '清除';
+    thumbnailClearButton.disabled = !unlocked;
+    thumbnailClearButton.hidden = !model.thumbnailFileName;
+    thumbnailClearButton.addEventListener('click', () => clearModelThumbnail(model, thumbnailClearButton));
+
+    thumbnailTools.append(thumbnailButton, thumbnailClearButton, thumbnailInput);
+    thumbnailPanel.append(thumbnailImage, thumbnailTools);
 
     const nameInput = document.createElement('input');
     nameInput.className = 'model-name-input';
@@ -319,11 +1007,11 @@ function renderModelRows() {
     nameInput.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
         event.preventDefault();
-        saveModel(model.id, nameInput, introInput, taxonomySelect);
+        saveModel(model.id, nameInput, introInput, taxonomySelect, attrInputs);
       }
     });
 
-    nameRow.append(fileIcon, nameInput);
+    nameRow.append(thumbnailPanel, nameInput);
 
     const meta = document.createElement('div');
     meta.className = 'model-file-meta';
@@ -339,7 +1027,7 @@ function renderModelRows() {
     introInput.addEventListener('keydown', (event) => {
       if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
         event.preventDefault();
-        saveModel(model.id, nameInput, introInput, taxonomySelect);
+        saveModel(model.id, nameInput, introInput, taxonomySelect, attrInputs);
       }
     });
 
@@ -359,7 +1047,39 @@ function renderModelRows() {
       taxonomySelect.append(option);
     }
 
-    main.append(nameRow, meta, introInput, taxonomySelect);
+    const attributionGroup = document.createElement('div');
+    attributionGroup.className = 'model-attribution';
+    for (const [fieldKey, fieldLabel] of Object.entries(ATTRIBUTION_FIELDS)) {
+      const label = document.createElement('label');
+      label.className = 'model-attribution-field';
+      const span = document.createElement('span');
+      span.textContent = fieldLabel;
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = model.attribution?.[fieldKey] || '';
+      input.placeholder = fieldLabel;
+      input.disabled = !unlocked;
+      input.setAttribute('aria-label', fieldLabel);
+      attrInputs[fieldKey] = input;
+      label.append(span, input);
+      attributionGroup.append(label);
+    }
+
+    const attributionHistoryEl = document.createElement('div');
+    attributionHistoryEl.className = 'model-attribution-history';
+    const attributionLog = Array.isArray(model.attributionLog) ? model.attributionLog : [];
+    if (attributionLog.length) {
+      const seen = { collector: 0, identifier: 0, builder: 0 };
+      for (const entry of attributionLog) {
+        seen[entry.field] = (seen[entry.field] || 0) + 1;
+        const round = seen[entry.field] + 1;
+        const line = document.createElement('span');
+        line.textContent = `${ATTRIBUTION_FIELDS[entry.field] || entry.field} 第${round}次：${entry.value}`;
+        attributionHistoryEl.append(line);
+      }
+    }
+
+    main.append(nameRow, meta, introInput, taxonomySelect, attributionGroup, attributionHistoryEl);
 
     const details = document.createElement('div');
     details.className = 'model-details';
@@ -377,7 +1097,7 @@ function renderModelRows() {
     saveButton.setAttribute('aria-label', '保存修改');
     saveButton.disabled = !unlocked;
     saveButton.append(createIcon('save'));
-    saveButton.addEventListener('click', () => saveModel(model.id, nameInput, introInput, taxonomySelect));
+    saveButton.addEventListener('click', () => saveModel(model.id, nameInput, introInput, taxonomySelect, attrInputs));
 
     const deleteButton = document.createElement('button');
     deleteButton.className = 'action-button delete';
@@ -395,28 +1115,33 @@ function renderModelRows() {
   createIcons({ icons });
 }
 
-async function loadModels() {
+async function loadModels(render = true) {
   const response = await fetch('/api/models');
   if (!response.ok) {
     throw new Error('无法读取模型列表。');
   }
   const data = await response.json();
   models = data.models || [];
-  refreshTaxonomyDependentUi();
+  if (render) refreshTaxonomyDependentUi();
 }
 
-async function loadTaxonomy() {
+async function loadTaxonomy(render = true) {
   const response = await fetch('/api/taxonomy');
   if (!response.ok) {
     throw new Error('无法读取分类列表。');
   }
   const data = await response.json();
   taxonomy = data.taxonomy || [];
+  rankCatalog = data.rankCatalog || [];
+  if (!render) return;
   renderTaxonomyList();
+  renderRankList();
+  renderRankTree();
+  renderRankOptions(taxonomyRankInput.value || '');
   renderModelRows();
 }
 
-async function saveModel(id, nameInput, introInput, taxonomySelect) {
+async function saveModel(id, nameInput, introInput, taxonomySelect, attrInputs) {
   if (!requireUnlocked()) return;
 
   const nextName = nameInput.value.trim();
@@ -428,12 +1153,22 @@ async function saveModel(id, nameInput, introInput, taxonomySelect) {
 
   const nextIntro = (introInput?.value || '').trim();
   const nextTaxonomyId = taxonomySelect?.value || null;
+  const nextAttribution = attrInputs
+    ? {
+        collector: (attrInputs.collector?.value || '').trim(),
+        identifier: (attrInputs.identifier?.value || '').trim(),
+        builder: (attrInputs.builder?.value || '').trim()
+      }
+    : undefined;
 
   try {
+    const payload = { name: nextName, intro: nextIntro, taxonomyId: nextTaxonomyId };
+    if (nextAttribution) payload.attribution = nextAttribution;
+
     const response = await fetch(`/api/models/${encodeURIComponent(id)}`, {
       method: 'PATCH',
       headers: authHeaders(true),
-      body: JSON.stringify({ name: nextName, intro: nextIntro, taxonomyId: nextTaxonomyId })
+      body: JSON.stringify(payload)
     });
 
     if (!response.ok) {
@@ -441,16 +1176,77 @@ async function saveModel(id, nameInput, introInput, taxonomySelect) {
       throw new Error(errorData.error || '保存失败。');
     }
 
+    const data = await response.json();
     const model = models.find((item) => item.id === id);
     if (model) {
       model.name = nextName;
       model.intro = nextIntro;
       model.taxonomyId = nextTaxonomyId;
+      if (data.model?.attribution) model.attribution = data.model.attribution;
+      if (Array.isArray(data.model?.attributionLog)) model.attributionLog = data.model.attributionLog;
     }
     refreshTaxonomyDependentUi();
     showToast('修改已保存');
   } catch (error) {
     showToast(error.message || '保存失败', true);
+  }
+}
+
+async function uploadModelThumbnail(model, file, button, buttonLabel) {
+  if (!requireUnlocked()) return;
+  if (!SUPPORTED_THUMBNAIL_EXTENSIONS.includes(fileExtension(file.name))) {
+    showToast('缩略图只支持 JPG / PNG / WebP', true);
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('thumbnail', file);
+  const previousLabel = buttonLabel.textContent;
+  button.disabled = true;
+  buttonLabel.textContent = '上传中';
+
+  try {
+    const response = await fetch(`/api/models/${encodeURIComponent(model.id)}/thumbnail`, {
+      method: 'PUT',
+      headers: authHeaders(),
+      body: formData
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || '缩略图上传失败。');
+    }
+
+    Object.assign(model, data.model || {});
+    renderModelRows();
+    showToast(data.warning || '缩略图已更新');
+  } catch (error) {
+    button.disabled = false;
+    buttonLabel.textContent = previousLabel;
+    showToast(error.message || '缩略图上传失败', true);
+  }
+}
+
+async function clearModelThumbnail(model, button) {
+  if (!requireUnlocked()) return;
+  if (!window.confirm(`确定清除“${model.name}”的缩略图吗？`)) return;
+
+  button.disabled = true;
+  try {
+    const response = await fetch(`/api/models/${encodeURIComponent(model.id)}/thumbnail`, {
+      method: 'DELETE',
+      headers: authHeaders()
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || '缩略图清除失败。');
+    }
+
+    Object.assign(model, data.model || {});
+    renderModelRows();
+    showToast(data.warning || '缩略图已清除');
+  } catch (error) {
+    button.disabled = false;
+    showToast(error.message || '缩略图清除失败', true);
   }
 }
 
@@ -592,9 +1388,15 @@ async function submitTaxonomyEditor() {
 
   const payload = {
     name,
-    rank: taxonomyRankInput.value,
+    code: taxonomyCodeInput.value.trim(),
+    rankKey: taxonomyRankInput.value,
+    nameLatin: taxonomyNameLatinInput.value.trim(),
     parentId: taxonomyParentInput.value || null,
-    keyText: taxonomyKeyTextInput.value.trim(),
+    identificationSummary: taxonomyKeyTextInput.value.trim(),
+    classificationBasis: taxonomyBasisInput.value.trim(),
+    intro: taxonomyIntroInput.value.trim(),
+    active: taxonomyActiveInput.value === 'true',
+    classificationStatus: taxonomyStatusInput.value,
     sortOrder: Number(taxonomySortInput.value) || undefined
   };
 
@@ -631,33 +1433,38 @@ async function submitTaxonomyEditor() {
   }
 }
 
-function uploadFile(file, index, total) {
+function uploadFile(file, task) {
   return new Promise((resolve, reject) => {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('name', file.name.replace(/\.ply$/i, ''));
+    formData.append('name', file.name.replace(/\.[^.]+$/, ''));
 
     const request = new XMLHttpRequest();
     request.open('POST', '/api/models');
     request.setRequestHeader('X-Admin-Key', adminKey);
+    task.setStatus('上传中 0%');
     request.upload.addEventListener('progress', (event) => {
       if (!event.lengthComputable) return;
-      const filePercent = (event.loaded / event.total) * 100;
-      const overallPercent = ((index + filePercent / 100) / total) * 100;
-      setUploadProgress(file.name, overallPercent);
+      task.setProgress((event.loaded / event.total) * 100);
     });
     request.addEventListener('load', () => {
       if (request.status >= 200 && request.status < 300) {
-        resolve(JSON.parse(request.responseText));
+        const result = JSON.parse(request.responseText);
+        task.setDone();
+        resolve(result);
       } else {
         let message = '上传失败。';
         try {
           message = JSON.parse(request.responseText).error || message;
         } catch (error) {}
+        task.setError(message);
         reject(new Error(message));
       }
     });
-    request.addEventListener('error', () => reject(new Error('网络错误，上传失败。')));
+    request.addEventListener('error', () => {
+      task.setError('网络错误，上传失败。');
+      reject(new Error('网络错误，上传失败。'));
+    });
     request.send(formData);
   });
 }
@@ -665,35 +1472,51 @@ function uploadFile(file, index, total) {
 async function handleFiles(files) {
   if (!requireUnlocked()) return;
 
-  const fileArray = Array.from(files).filter((file) => file.name.toLowerCase().endsWith('.ply'));
+  const fileArray = Array.from(files).filter((file) => SUPPORTED_MODEL_EXTENSIONS.includes(fileExtension(file.name)));
   if (fileArray.length === 0) {
-    showToast('请选择 PLY 文件', true);
+    showToast('请选择 PLY / SPZ / SPLAT / KSPLAT 文件', true);
     return;
   }
 
+  uploadTasks.replaceChildren();
+  const tasks = fileArray.map((file) => createUploadTask(file));
+  uploadTasks.hidden = false;
   uploadZone.setAttribute('aria-busy', 'true');
-  for (let index = 0; index < fileArray.length; index++) {
-    try {
-      const result = await uploadFile(fileArray[index], index, fileArray.length);
-      models.unshift(result.model);
+
+  let doneCount = 0;
+  let failCount = 0;
+  const CONCURRENCY = 3;
+  let cursor = 0;
+  const worker = async () => {
+    while (cursor < fileArray.length) {
+      const index = cursor++;
+      try {
+        const result = await uploadFile(fileArray[index], tasks[index]);
+        models.unshift(result.model);
+        doneCount += 1;
+      } catch (error) {
+        failCount += 1;
+        showToast(`${fileArray[index].name}: ${error.message || '上传失败'}`, true);
+      }
       updateSummary();
       renderModelRows();
-      if (fileArray.length === 1) {
-        showToast(`${result.model.name} 上传完成`);
-      }
-    } catch (error) {
-      showToast(error.message || '上传失败', true);
     }
-  }
-
-  if (fileArray.length > 1) {
-    showToast('批量上传完成');
-  }
+  };
+  await Promise.all(Array.from({ length: Math.min(CONCURRENCY, fileArray.length) }, worker));
 
   uploadZone.removeAttribute('aria-busy');
-  uploadProgress.hidden = true;
-  uploadProgressFill.style.width = '0%';
   fileInput.value = '';
+
+  if (fileArray.length === 1 && failCount === 0) {
+    showToast('上传完成');
+  } else if (fileArray.length > 1) {
+    showToast(`批量上传完成：成功 ${doneCount} 个，失败 ${failCount} 个`);
+  }
+
+  window.setTimeout(() => {
+    uploadTasks.replaceChildren();
+    uploadTasks.hidden = true;
+  }, 4000);
 }
 
 uploadZone.addEventListener('click', () => {
@@ -734,8 +1557,15 @@ addTaxonomyButton.addEventListener('click', () => {
   openTaxonomyEditor();
 });
 
+addRankButton.addEventListener('click', () => {
+  if (!requireUnlocked()) return;
+  openRankEditor();
+});
+
 taxonomySaveButton.addEventListener('click', submitTaxonomyEditor);
 taxonomyCancelButton.addEventListener('click', closeTaxonomyEditor);
+rankSaveButton.addEventListener('click', saveRank);
+rankCancelButton.addEventListener('click', closeRankEditor);
 taxonomyNameInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') {
     event.preventDefault();
@@ -788,8 +1618,29 @@ lockButton.addEventListener('click', () => {
   showToast('编辑已锁定');
 });
 
+tabRankBtn.addEventListener('click', () => {
+  activeTab = 'rank';
+  applyTabVisibility();
+});
+
+tabFillBtn.addEventListener('click', () => {
+  activeTab = 'fill';
+  applyTabVisibility();
+});
+
+tabModelsBtn.addEventListener('click', () => {
+  activeTab = 'models';
+  applyTabVisibility();
+});
+
 readStoredAuth();
 renderAuthState();
-Promise.all([loadModels(), loadTaxonomy()]).catch((error) => {
-  showToast(error.message || '加载失败', true);
-});
+Promise.all([loadModels(false), loadTaxonomy(false)])
+  .then(() => {
+    updateSummary();
+    renderAuthState();
+    renderRankOptions(taxonomyRankInput.value || '');
+  })
+  .catch((error) => {
+    showToast(error.message || '加载失败', true);
+  });

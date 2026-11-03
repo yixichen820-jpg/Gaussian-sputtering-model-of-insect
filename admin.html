@@ -58,29 +58,27 @@
           </form>
         </section>
 
-        <section class="upload-section" id="upload-section" hidden>
+        <nav class="admin-tabs" id="admin-tabs" aria-label="管理分区">
+          <button class="admin-tab" id="tab-rank-btn" type="button" aria-selected="false">阶元管理</button>
+          <button class="admin-tab" id="tab-fill-btn" type="button" aria-selected="false">模型填充</button>
+          <button class="admin-tab is-active" id="tab-models-btn" type="button" aria-selected="true">模型管理</button>
+        </nav>
+
+        <section class="upload-section" id="upload-section" data-tab="models" hidden>
           <form id="upload-form" class="upload-form">
-            <input id="file-input" name="file" type="file" accept=".ply" multiple hidden />
+            <input id="file-input" name="file" type="file" accept=".ply,.spz,.splat,.ksplat" multiple hidden />
             <button id="upload-zone" class="upload-zone" type="button">
               <span class="upload-icon" aria-hidden="true">
                 <i data-lucide="upload-cloud"></i>
               </span>
-              <strong id="upload-title">选择 PLY 文件</strong>
-              <span id="upload-subtitle">支持单个或批量上传</span>
+              <strong id="upload-title">选择模型文件</strong>
+              <span id="upload-subtitle">支持 PLY / SPZ / SPLAT / KSPLAT，可批量上传</span>
             </button>
           </form>
-          <div class="upload-progress" id="upload-progress" hidden>
-            <div class="upload-progress-copy">
-              <span id="upload-progress-name"></span>
-              <span id="upload-progress-percent">0%</span>
-            </div>
-            <div class="progress-line">
-              <div class="progress-line-fill" id="upload-progress-fill"></div>
-            </div>
-          </div>
+          <div class="upload-tasks" id="upload-tasks" hidden></div>
         </section>
 
-        <section class="summary-band" aria-label="模型统计">
+        <section class="summary-band" aria-label="模型统计" data-tab="models">
           <div>
             <span class="summary-label">模型数量</span>
             <strong id="model-count">0</strong>
@@ -95,10 +93,63 @@
           </div>
         </section>
 
-        <section class="taxonomy-section">
+        <section class="rank-catalog-section" data-tab="rank">
           <div class="section-heading">
             <div>
-              <h2>分类条目</h2>
+              <h2>阶元管理</h2>
+              <span id="rank-catalog-hint"></span>
+            </div>
+            <button class="back-link add-rank-button" id="add-rank-button" type="button">
+              <i data-lucide="plus"></i>
+              <span>新增阶元</span>
+            </button>
+          </div>
+          <form class="rank-editor" id="rank-editor" hidden>
+            <div class="rank-editor-grid">
+              <label>
+                <span>阶元 key</span>
+                <input id="rank-key" type="text" maxlength="40" placeholder="例如：subfamily" />
+              </label>
+              <label>
+                <span>中文名</span>
+                <input id="rank-name" type="text" maxlength="40" placeholder="例如：亚科" />
+              </label>
+              <label>
+                <span>拉丁名</span>
+                <input id="rank-name-latin" type="text" maxlength="80" placeholder="例如：Subfamilia" />
+              </label>
+              <label>
+                <span>坐标</span>
+                <input id="rank-position" type="text" placeholder="例如：20.1" />
+              </label>
+              <label>
+                <span>阶元类型</span>
+                <select id="rank-base">
+                  <option value="false">特殊阶元</option>
+                  <option value="true">基础阶元</option>
+                </select>
+              </label>
+              <input id="rank-parent-id" type="hidden" />
+            </div>
+            <div class="taxonomy-editor-actions">
+              <button class="action-button primary-action" id="rank-save" type="button">
+                <i data-lucide="save"></i>
+                <span>保存阶元</span>
+              </button>
+              <button class="action-button" id="rank-cancel" type="button">
+                <i data-lucide="x"></i>
+                <span>取消</span>
+              </button>
+            </div>
+          </form>
+          <div id="rank-tree" class="rank-tree"></div>
+          <div id="rank-list" class="rank-list"></div>
+        </section>
+
+        <section class="taxonomy-section" data-tab="fill">
+          <div class="section-heading">
+            <div>
+              <h2>模型填充</h2>
               <span id="taxonomy-hint"></span>
             </div>
             <button class="back-link add-taxonomy-button" id="add-taxonomy-button" type="button">
@@ -113,12 +164,13 @@
                 <input id="taxonomy-name" type="text" maxlength="50" placeholder="例如：鞘翅目" />
               </label>
               <label>
+                <span>坐标</span>
+                <input id="taxonomy-code" type="text" maxlength="120" placeholder="例如：QCM:40-001" />
+              </label>
+              <label>
                 <span>层级</span>
                 <select id="taxonomy-rank">
-                  <option value="order">目</option>
-                  <option value="family">科</option>
-                  <option value="genus">属</option>
-                  <option value="species">种</option>
+                  <option value="">加载中...</option>
                 </select>
               </label>
               <label>
@@ -132,9 +184,37 @@
                 <input id="taxonomy-sort" type="number" min="1" step="1" value="1" />
               </label>
             </div>
+            <div class="taxonomy-editor-grid">
+              <label>
+                <span>拉丁学名</span>
+                <input id="taxonomy-name-latin" type="text" maxlength="120" placeholder="例如：Lepidoptera" />
+              </label>
+              <label>
+                <span>状态</span>
+                <select id="taxonomy-active">
+                  <option value="true">启用</option>
+                  <option value="false">停用</option>
+                </select>
+              </label>
+              <label>
+                <span>核实状态</span>
+                <select id="taxonomy-status">
+                  <option value="confirmed">已确认</option>
+                  <option value="pending">待确认</option>
+                </select>
+              </label>
+            </div>
             <label class="taxonomy-key-label">
-              <span>检索特征</span>
-              <textarea id="taxonomy-key-text" rows="3" maxlength="500" placeholder="用于生物检索表的区分特征，例如：前翅角质硬化，形成鞘翅。"></textarea>
+              <span>鉴定特征摘要</span>
+              <textarea id="taxonomy-key-text" rows="3" maxlength="500" placeholder="用于快速识别，例如：前翅角质硬化，形成鞘翅。"></textarea>
+            </label>
+            <label class="taxonomy-key-label">
+              <span>分类依据</span>
+              <textarea id="taxonomy-basis" rows="3" maxlength="1000" placeholder="例如：形态学、分子系统学依据"></textarea>
+            </label>
+            <label class="taxonomy-key-label">
+              <span>阶元介绍</span>
+              <textarea id="taxonomy-intro" rows="4" maxlength="2000" placeholder="该分类的总体介绍"></textarea>
             </label>
             <div class="taxonomy-editor-actions">
               <button class="action-button primary-action" id="taxonomy-save" type="button">
@@ -150,7 +230,7 @@
           <div id="taxonomy-list" class="taxonomy-list"></div>
         </section>
 
-        <section class="model-list-section">
+        <section class="model-list-section" data-tab="models">
           <div class="section-heading">
             <h2>模型列表</h2>
             <span id="list-hint"></span>
@@ -165,6 +245,10 @@
     </div>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <footer class="admin-site-version">
+      <a href="/changelog.html">V8.7</a>
+      <span>CYC联合创建</span>
+    </footer>
     <script type="module" src="/admin.js"></script>
   </body>
 </html>

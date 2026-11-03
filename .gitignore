@@ -16,7 +16,11 @@ Thumbs.db
 .idea/
 
 *.ply
+*.splat
+*.ksplat
 *.spz
+*.glb
+*.gltf
 *.mp4
 *.webm
 *.mov
@@ -25,6 +29,10 @@ Thumbs.db
 
 /models/*
 !/models/.gitkeep
+/thumbs/thumb-*
+*.backup-*
+*.bak
+main.js.after-optimized.js
 
 /*.zip
 /deploy.zip
@@ -35,3 +43,6 @@ Thumbs.db
 /_preview/
 /_v2_check/
 /_stage1_backup_*/
+/_agent_tmp/
+/local-site-v8.7/
+/v8.5-backup-*/

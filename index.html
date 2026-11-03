@@ -10,21 +10,25 @@
       {
         "imports": {
           "three": "/node_modules/three/build/three.module.js",
+          "three/addons/": "/node_modules/three/examples/jsm/",
           "@mkkellogg/gaussian-splats-3d": "/node_modules/@mkkellogg/gaussian-splats-3d/build/gaussian-splats-3d.module.js",
           "lucide": "/node_modules/lucide/dist/esm/lucide.mjs"
         }
       }
     </script>
   </head>
-  <body>
+  <body class="catalog-open">
     <main class="app-shell">
-      <section class="stage" id="stage" aria-label="高斯溅射模型查看器"></section>
+      <section class="stage is-empty" id="stage" aria-label="高斯溅射模型查看器">
+        <div class="stage-prompt" id="stage-prompt">
+          <span class="stage-prompt-mark" aria-hidden="true"></span>
+          <strong>选择一个昆虫模型</strong>
+          <span>点击列表中的模型后再加载 3D 内容</span>
+        </div>
+      </section>
 
       <header class="topbar">
         <div class="brand-block">
-          <div class="brand-mark" aria-hidden="true">
-            <i data-lucide="scan"></i>
-          </div>
           <div>
             <p class="eyebrow">Gaussian Splat Viewer</p>
             <h1>昆虫高斯溅射模型展示</h1>
@@ -40,7 +44,6 @@
             </button>
             <div class="search-results" id="search-results" hidden></div>
           </div>
-          <div class="model-switcher" id="model-switcher" role="tablist" aria-label="模型切换"></div>
           <div class="active-filter" id="active-filter" hidden>
             <i data-lucide="filter"></i>
             <span id="active-filter-label"></span>
@@ -51,18 +54,24 @@
         </div>
 
         <div class="toolbar" aria-label="视图工具">
+          <button class="icon-button" id="catalog-back" type="button" aria-label="返回主界面" title="返回主界面">
+            <i data-lucide="arrow-left"></i>
+          </button>
+          <button class="icon-button" id="theme-toggle" type="button" aria-label="切换浅色模式">
+            <i data-lucide="sun"></i>
+          </button>
           <button class="icon-button" id="auto-rotate" type="button" aria-label="自动环绕" aria-pressed="false">
             <i data-lucide="rotate-cw"></i>
           </button>
           <button class="icon-button" id="reset-view" type="button" aria-label="复位视角">
-            <i data-lucide="scan"></i>
+            <i data-lucide="locate-fixed"></i>
+          </button>
+          <button class="icon-button" id="share" type="button" aria-label="复制分享链接">
+            <i data-lucide="share-2"></i>
           </button>
           <button class="icon-button" id="fullscreen" type="button" aria-label="全屏">
             <i data-lucide="maximize"></i>
           </button>
-          <a class="icon-button" id="admin-link" href="/admin.html" aria-label="模型管理">
-            <i data-lucide="settings-2"></i>
-          </a>
         </div>
       </header>
 
@@ -70,40 +79,64 @@
         <div class="side-panel-head">
           <span class="side-panel-title">
             <i data-lucide="list-tree"></i>
-            <span>分类与介绍</span>
+            <span id="side-panel-title-text">分类与介绍</span>
           </span>
           <button class="icon-button panel-collapse" id="panel-collapse" type="button" aria-label="折叠侧栏" aria-pressed="false">
             <i data-lucide="panel-left-close"></i>
           </button>
         </div>
         <div class="side-panel-body" id="side-panel-body">
-          <div class="side-status">
-            <span class="status-dot" id="status-dot"></span>
-            <span id="status-text">准备加载</span>
-          </div>
-          <div class="side-model-card">
-            <div class="side-model-name">
-              <span class="meta-label">模型</span>
-              <strong id="model-name">原视频</strong>
+          <div class="side-model-details">
+            <div class="side-status">
+              <span class="status-dot" id="status-dot"></span>
+              <span id="status-text">准备加载</span>
             </div>
-            <div class="side-model-points">
-              <span class="meta-label">高斯点</span>
-              <strong id="splat-count">460,668</strong>
+            <div class="side-model-card">
+              <div class="side-model-name">
+                <span class="meta-label">模型</span>
+                <strong id="model-name">原视频</strong>
+              </div>
+              <div class="side-model-points">
+                <span class="meta-label">高斯点</span>
+                <strong id="splat-count">460,668</strong>
+              </div>
+              <div class="info-taxonomy" id="info-taxonomy">未分类</div>
             </div>
-            <div class="info-taxonomy" id="info-taxonomy">未分类</div>
+            <div class="side-section-title">模型介绍</div>
+            <div class="side-intro" id="intro-text">暂无介绍。</div>
+            <div class="side-section-title">标本署名</div>
+            <div class="attribution-list">
+              <div class="attribution-row">
+                <span class="attribution-label">采集者</span>
+                <strong id="attr-collector">—</strong>
+              </div>
+              <div class="attribution-row">
+                <span class="attribution-label">鉴定者</span>
+                <strong id="attr-identifier">—</strong>
+              </div>
+              <div class="attribution-row">
+                <span class="attribution-label">模型构建者</span>
+                <strong id="attr-builder">—</strong>
+              </div>
+            </div>
+            <div class="attribution-history" id="attribution-history" hidden>
+              <button class="attribution-history-toggle" id="attribution-history-toggle" type="button">
+                <span id="attribution-history-count">修改记录</span>
+                <i data-lucide="chevron-down"></i>
+              </button>
+              <div class="attribution-history-list" id="attribution-history-list"></div>
+            </div>
           </div>
-          <div class="side-section-title">模型介绍</div>
-          <div class="side-intro" id="intro-text">暂无介绍。</div>
           <div class="side-section-title">分类条目</div>
           <p class="taxonomy-hint">点击分类查看该目下的模型，点击箭头展开下级分类。</p>
           <div class="taxonomy-tree" id="taxonomy-tree"></div>
-          <div class="side-section-head">
+          <div class="side-section-head side-all-models">
             <span class="side-section-title">全部模型</span>
             <button class="all-models-toggle" id="all-models-toggle" type="button" aria-label="展开全部模型" aria-pressed="false">
               <i data-lucide="chevron-down"></i>
             </button>
           </div>
-          <div class="all-models-list" id="all-models-list" hidden></div>
+          <div class="all-models-list side-all-models" id="all-models-list" hidden></div>
         </div>
 
         <div class="taxonomy-drawer" id="taxonomy-drawer" hidden>
@@ -124,10 +157,80 @@
         触屏使用，单指滑动为改变视角，双指滑动可移动模型同时可以进行缩放；PC端操作，鼠标左键变换视角，右键移动模型，滚轮进行缩放
       </div>
 
+      <div class="view-ball" id="view-ball" role="button" tabindex="0" aria-label="拖动旋转三维视角" title="拖动旋转三维视角">
+        <canvas id="view-ball-canvas" width="128" height="128"></canvas>
+      </div>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
       <div class="progress-track" id="progress-track" aria-hidden="true">
         <div class="progress-fill" id="progress-fill"></div>
       </div>
     </main>
+
+    <section class="catalog-view" id="catalog-view" aria-label="昆虫模型目录">
+      <aside class="catalog-sidebar">
+        <div class="catalog-panel-host" id="catalog-panel-host"></div>
+      </aside>
+
+      <main class="catalog-main">
+        <header class="catalog-header">
+          <div class="catalog-heading">
+            <span class="catalog-eyebrow">MODEL CATALOG</span>
+            <div class="catalog-title-row">
+              <h2 id="catalog-title">全部模型</h2>
+              <span class="catalog-rank-badge" id="catalog-rank">ALL</span>
+              <button class="catalog-reset-filter" id="catalog-reset-filter" type="button">全部</button>
+            </div>
+          </div>
+          <div class="catalog-header-actions">
+            <label class="catalog-search">
+              <i data-lucide="search"></i>
+              <input id="catalog-search-input" type="search" placeholder="搜索模型或分类" autocomplete="off" />
+            </label>
+            <button class="catalog-theme-toggle" id="catalog-theme-toggle" type="button" aria-label="切换为浅色模式" title="切换为浅色模式">
+              <i data-lucide="sun"></i>
+            </button>
+          </div>
+        </header>
+
+        <div class="catalog-grid" id="catalog-grid"></div>
+        <div class="catalog-empty" id="catalog-empty" hidden>该分类下暂时没有模型。</div>
+
+        <footer class="catalog-pagination">
+          <label class="catalog-page-size">
+            <span>每页</span>
+            <select id="catalog-page-size">
+              <option value="12">12</option>
+              <option value="24">24</option>
+              <option value="48">48</option>
+            </select>
+            <span>条</span>
+          </label>
+          <span class="catalog-total" id="catalog-total">共 0 条记录</span>
+          <div class="catalog-page-controls">
+            <button id="catalog-prev" class="catalog-page-button" type="button" aria-label="上一页">
+              <i data-lucide="chevron-left"></i>
+            </button>
+            <div class="catalog-page-numbers" id="catalog-page-numbers"></div>
+            <button id="catalog-next" class="catalog-page-button" type="button" aria-label="下一页">
+              <i data-lucide="chevron-right"></i>
+            </button>
+          </div>
+        </footer>
+      </main>
+    </section>
+
+    <div class="site-utility">
+      <a class="admin-entry" id="admin-link" href="/admin.html" aria-label="进入管理界面">
+        <i data-lucide="settings-2"></i>
+        <span>管理界面</span>
+      </a>
+      <footer class="site-version">
+        <a href="/changelog.html">V8.7</a>
+        <span>CYC联合创建</span>
+      </footer>
+    </div>
 
     <script type="module" src="/main.js"></script>
   </body>

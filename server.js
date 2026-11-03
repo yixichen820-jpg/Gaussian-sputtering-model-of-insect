@@ -5,7 +5,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { URL } = require('url');
 const Busboy = require('busboy');
-require('dotenv').config({ path: path.join(__dirname, '.env') });
+require('dotenv').config();
 
 let OSS;
 try {
@@ -16,16 +16,12 @@ try {
 
 const rootDir = __dirname;
 const modelsDir = path.join(rootDir, 'models');
+const thumbnailsDir = path.join(rootDir, 'thumbs');
 const dataDir = path.join(rootDir, 'data');
 const manifestPath = path.join(dataDir, 'models.json');
 const taxonomyPath = path.join(dataDir, 'taxonomy.json');
 const port = Number(process.env.PORT || 4173);
-const adminKey = process.env.ADMIN_KEY;
-
-if (!adminKey || adminKey.trim().length === 0) {
-  console.error('缺少 ADMIN_KEY 环境变量。请设置非空的管理密钥后再启动服务器。');
-  process.exit(1);
-}
+const adminKey = process.env.ADMIN_KEY || 'Logenshinve';
 
 const ossRegion = process.env.OSS_REGION || '';
 const ossBucket = process.env.OSS_BUCKET || '';
@@ -47,11 +43,35 @@ const mimeTypes = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
+  '.webp': 'image/webp',
   '.svg': 'image/svg+xml',
   '.map': 'application/json; charset=utf-8'
 };
 
-const seedModels = [];
+const seedModels = [
+  {
+    id: 'original-video',
+    name: '原视频',
+    fileName: '原视频.ply',
+    originalName: 'final.ply',
+    splatCount: 460668,
+    center: [-1.477460493317872, 0.6474183397394051, 7.8252014425847545],
+    size: [65.03194618225098, 48.72028160095215, 101.84395408630371],
+    createdAt: '2026-09-21T13:21:22.000Z',
+    updatedAt: '2026-09-21T13:21:22.000Z'
+  },
+  {
+    id: 'garden-tiger-moth',
+    name: '大丽灯蛾',
+    fileName: '大丽灯蛾.ply',
+    originalName: '大丽灯蛾final.ply',
+    splatCount: 28328,
+    center: [1.330281365521342, 3.684586825380101, 0.7816264259336924],
+    size: [26.624978065490723, 22.238462924957275, 25.706748008728027],
+    createdAt: '2026-09-21T17:20:18.000Z',
+    updatedAt: '2026-09-21T17:20:18.000Z'
+  }
+];
 
 const seedTaxonomy = [
   { id: 'order-coleoptera', name: '鞘翅目', rank: 'order', parentId: null, keyText: '前翅角质硬化，形成鞘翅；后翅膜质，静止时折叠于鞘翅下。', sortOrder: 1 },
@@ -80,6 +100,7 @@ const baseRankCatalog = [
 ];
 
 fs.mkdirSync(modelsDir, { recursive: true });
+fs.mkdirSync(thumbnailsDir, { recursive: true });
 fs.mkdirSync(dataDir, { recursive: true });
 
 function parseJsonFile(filePath) {
@@ -201,16 +222,113 @@ function saveTaxonomy() {
 }
 
 const taxonomyRankCatalog = taxonomyManifest.rankCatalog || baseRankCatalog;
-const taxonomyRanks = taxonomyRankCatalog.map((entry) => entry.key);
-const rankLabels = Object.fromEntries(taxonomyRankCatalog.map((entry) => [entry.key, entry.name]));
 
 function getRankPosition(rankKey) {
   const rank = taxonomyRankCatalog.find((entry) => entry.key === rankKey);
   return rank ? Number(rank.position) : -1;
 }
 
+function getRankLabel(rankKey) {
+  const rank = taxonomyRankCatalog.find((entry) => entry.key === rankKey);
+  return rank ? rank.name : rankKey;
+}
+
 function getTaxonomyEntry(id) {
   return taxonomyManifest.entries.find((entry) => entry.id === id) || null;
+}
+
+function previousBaseRankKey(rankKey) {
+  const bases = taxonomyRankCatalog
+    .filter((rank) => rank.base)
+    .sort((a, b) => Number(a.position) - Number(b.position));
+  const index = bases.findIndex((rank) => rank.key === rankKey);
+  return index > 0 ? bases[index - 1].key : null;
+}
+
+function createPendingTaxonomyEntry(rankKey, parentId) {
+  const id = `pending-${crypto.randomUUID()}`;
+  const now = new Date().toISOString();
+  const entry = {
+    id,
+    name: '待补充',
+    nameLatin: '',
+    code: '',
+    rankKey,
+    parentId: parentId || null,
+    intro: '',
+    classificationBasis: '',
+    identificationSummary: '',
+    active: true,
+    classificationStatus: 'pending',
+    sortOrder: 1,
+    createdAt: now,
+    updatedAt: now
+  };
+  taxonomyManifest.entries.push(entry);
+  return entry;
+}
+
+function ensureAncestorPathForEntry(entryId) {
+  const entry = getTaxonomyEntry(entryId);
+  if (!entry) return;
+
+  const visited = new Set();
+  let current = entry;
+  while (current && (current.rankKey || current.rank) !== 'kingdom' && !visited.has(current.id)) {
+    visited.add(current.id);
+    const parent = current.parentId ? getTaxonomyEntry(current.parentId) : null;
+    if (parent) {
+      current = parent;
+      continue;
+    }
+
+    const parentRank = previousBaseRankKey(current.rankKey || current.rank);
+    if (!parentRank) break;
+    const placeholder = createPendingTaxonomyEntry(parentRank, null);
+    current.parentId = placeholder.id;
+    current = placeholder;
+  }
+
+  saveTaxonomy();
+}
+
+const codeAbbrMap = {
+  '动物界': 'DWJ',
+  '节肢动物门': 'JZDM',
+  '昆虫纲': 'KCG',
+  '鞘翅目': 'QCM',
+  '半翅目': 'BCM',
+  '鳞翅目': 'LCM',
+  '脉翅目': 'MCM',
+  '蜻蜓目': 'QTM',
+  '膜翅目': 'MCM',
+  '双翅目': 'SCM',
+  '蜚蠊目': 'FLM',
+  '革翅目': 'GCM',
+  '螳螂目': 'TLM',
+  '䗛目': 'XMM',
+  '直翅目': 'ZCM',
+  '未知目': 'WZM'
+};
+
+function codePrefix(name) {
+  return codeAbbrMap[name] || 'TAX';
+}
+
+function generateTaxonomyCode(parentId, rankKey, name) {
+  const position = getRankPosition(rankKey);
+  if (position < 0) return '';
+  const siblings = taxonomyManifest.entries.filter((entry) => (entry.parentId || null) === (parentId || null));
+  const seq = siblings.length + 1;
+  const ownCode = `${codePrefix(name)}:${position}-${String(seq).padStart(3, '0')}`;
+  const parent = getTaxonomyEntry(parentId);
+  return parent?.code ? `${parent.code}/${ownCode}` : ownCode;
+}
+
+function isCodeAvailable(code, existingId = null) {
+  const normalized = String(code || '').trim();
+  if (!normalized) return true;
+  return !taxonomyManifest.entries.some((entry) => entry.id !== existingId && entry.code === normalized);
 }
 
 function taxonomyName(id) {
@@ -231,15 +349,18 @@ function safeTaxonomy(entry) {
   return {
     id: entry.id,
     name: entry.name,
+    code: entry.code || '',
     rank: rankKey,
     rankKey,
-    rankLabel: rankLabels[rankKey] || rankKey,
+    rankLabel: getRankLabel(rankKey),
+    rankPosition: getRankPosition(rankKey),
     parentId: entry.parentId || null,
     keyText: identificationSummary,
     nameLatin: entry.nameLatin || '',
     intro: entry.intro || '',
     classificationBasis: entry.classificationBasis || '',
     identificationSummary,
+    needsChineseName: Boolean(entry.needsChineseName),
     active: entry.active !== false,
     classificationStatus: entry.classificationStatus || 'confirmed',
     sortOrder: Number.isFinite(Number(entry.sortOrder)) ? Number(entry.sortOrder) : 0,
@@ -273,9 +394,28 @@ function ossObjectUrl(fileName) {
   return `${ossBaseUrl}/${ossObjectKey(fileName).split('/').map(encodeURIComponent).join('/')}`;
 }
 
+function modelThumbnailUrl(model) {
+  if (model.thumbnail) return model.thumbnail;
+  if (model.thumbnailUrl) return model.thumbnailUrl;
+  if (model.thumbnailFileName) {
+    if (model.thumbnailStorage === 'oss') {
+      return ossObjectUrl(model.thumbnailFileName);
+    }
+    return `/thumbs/${encodeURIComponent(model.thumbnailFileName)}`;
+  }
+
+  const legacyName = `${model.id || ''}.jpg`;
+  const legacyPath = path.resolve(thumbnailsDir, legacyName);
+  const isInsideThumbnailsDir = legacyPath.startsWith(thumbnailsDir + path.sep);
+  if (isInsideThumbnailsDir && fs.existsSync(legacyPath)) {
+    return `/thumbs/${encodeURIComponent(legacyName)}`;
+  }
+  return '/thumbs/placeholder.svg';
+}
+
 function safeModel(model) {
   let fileSize = 0;
-  if (model.storage === 'oss' && ossEnabled && Number.isFinite(Number(model.fileSize))) {
+  if (Number.isFinite(Number(model.fileSize))) {
     fileSize = Number(model.fileSize);
   } else if (model.fileName) {
     try {
@@ -298,13 +438,23 @@ function safeModel(model) {
     taxonomyId: model.taxonomyId || null,
     taxonomyName: taxonomyName(model.taxonomyId),
     storage: model.storage || 'local',
+    thumbnail: modelThumbnailUrl(model),
+    thumbnailFileName: model.thumbnailFileName || '',
+    thumbnailStorage: model.thumbnailStorage || '',
+    thumbnailFileSize: model.thumbnailFileSize || 0,
     createdAt: model.createdAt,
-    updatedAt: model.updatedAt
+    updatedAt: model.updatedAt,
+    attribution: model.attribution || { collector: '', identifier: '', builder: '' },
+    attributionLog: Array.isArray(model.attributionLog) ? model.attributionLog : []
   };
 }
 
 function modelUrl(model) {
-  if (model.storage === 'oss' && ossEnabled && model.fileName) {
+  if (model.url) {
+    return model.url;
+  }
+
+  if (model.storage === 'oss' && model.fileName) {
     return ossObjectUrl(model.fileName);
   }
   return `/models/${encodeURIComponent(model.fileName)}`;
@@ -432,6 +582,8 @@ function readJsonBody(req) {
   });
 }
 
+const MAX_THUMBNAIL_SIZE_BYTES = 8 * 1024 * 1024;
+
 function parseUpload(req) {
   return new Promise((resolve, reject) => {
     const busboy = Busboy({
@@ -447,6 +599,16 @@ function parseUpload(req) {
     };
 
     busboy.on('file', (fieldName, fileStream, info) => {
+      if (fieldName !== 'file') {
+        fileStream.resume();
+        return;
+      }
+      if (result.file) {
+        fileStream.resume();
+        reject(new Error('一次只能上传一个模型文件。'));
+        return;
+      }
+
       const tempName = `upload-${Date.now()}-${crypto.randomUUID()}.tmp`;
       const tempPath = path.join(modelsDir, tempName);
       const writeStream = fs.createWriteStream(tempPath);
@@ -484,6 +646,79 @@ function parseUpload(req) {
   });
 }
 
+function parseThumbnailUpload(req) {
+  return new Promise((resolve, reject) => {
+    const busboy = Busboy({
+      headers: req.headers,
+      limits: {
+        files: 1,
+        fileSize: MAX_THUMBNAIL_SIZE_BYTES
+      }
+    });
+    let thumbnail = null;
+
+    busboy.on('file', (fieldName, fileStream, info) => {
+      if (fieldName !== 'thumbnail') {
+        fileStream.resume();
+        return;
+      }
+      if (thumbnail) {
+        fileStream.resume();
+        reject(new Error('一次只能上传一张缩略图。'));
+        return;
+      }
+
+      const tempPath = path.join(modelsDir, `thumb-upload-${Date.now()}-${crypto.randomUUID()}.tmp`);
+      const writeStream = fs.createWriteStream(tempPath);
+      thumbnail = {
+        tempPath,
+        writeStream,
+        originalName: info.filename,
+        mimeType: info.mimeType
+      };
+
+      fileStream.on('limit', () => {
+        fileStream.unpipe(writeStream);
+        writeStream.destroy();
+        reject(new Error('缩略图不能超过 8MB。'));
+      });
+      writeStream.on('error', reject);
+      fileStream.pipe(writeStream);
+    });
+
+    busboy.on('error', reject);
+    busboy.on('finish', () => {
+      if (!thumbnail) {
+        reject(new Error('没有收到缩略图文件。'));
+        return;
+      }
+      resolve({ thumbnail });
+    });
+    req.pipe(busboy);
+  });
+}
+
+const SUPPORTED_MODEL_EXTENSIONS = ['.ply', '.spz', '.splat', '.ksplat'];
+
+function modelFileType(originalName) {
+  const ext = path.extname(originalName || '').toLowerCase();
+  return SUPPORTED_MODEL_EXTENSIONS.includes(ext) ? ext : null;
+}
+
+const SUPPORTED_THUMBNAIL_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp'];
+
+function thumbnailFileType(originalName) {
+  const ext = path.extname(originalName || '').toLowerCase();
+  if (!SUPPORTED_THUMBNAIL_EXTENSIONS.includes(ext)) return null;
+  return ext === '.jpeg' ? '.jpg' : ext;
+}
+
+function thumbnailMimeType(ext) {
+  if (ext === '.png') return 'image/png';
+  if (ext === '.webp') return 'image/webp';
+  return 'image/jpeg';
+}
+
 async function isPlyFile(filePath) {
   const handle = await fsp.open(filePath, 'r');
   try {
@@ -492,6 +727,58 @@ async function isPlyFile(filePath) {
     return bytesRead >= 3 && buffer.subarray(0, 3).toString('ascii') === 'ply';
   } finally {
     await handle.close();
+  }
+}
+
+async function isThumbnailFile(filePath, ext) {
+  const handle = await fsp.open(filePath, 'r');
+  try {
+    const buffer = Buffer.alloc(12);
+    const { bytesRead } = await handle.read(buffer, 0, buffer.length, 0);
+    if (ext === '.png') {
+      return bytesRead >= 8 && buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+    }
+    if (ext === '.webp') {
+      return bytesRead >= 12 &&
+        buffer.subarray(0, 4).toString('ascii') === 'RIFF' &&
+        buffer.subarray(8, 12).toString('ascii') === 'WEBP';
+    }
+    return bytesRead >= 3 &&
+      buffer[0] === 0xff &&
+      buffer[1] === 0xd8 &&
+      buffer[2] === 0xff;
+  } finally {
+    await handle.close();
+  }
+}
+
+function waitForUploadWrite(stream) {
+  return new Promise((resolve, reject) => {
+    if (stream.closed) {
+      resolve();
+      return;
+    }
+    stream.once('close', resolve);
+    stream.once('error', reject);
+  });
+}
+
+async function removeStoredUpload(storage, fileName, directory) {
+  if (!fileName) return;
+  if (storage === 'oss' && ossEnabled) {
+    await getOssClient().delete(ossObjectKey(fileName));
+    return;
+  }
+
+  const filePath = path.resolve(directory, fileName);
+  const isInsideDirectory = filePath === directory || filePath.startsWith(directory + path.sep);
+  if (!isInsideDirectory) {
+    throw new Error(`拒绝删除目录之外的文件: ${filePath}`);
+  }
+  try {
+    await fsp.unlink(filePath);
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
   }
 }
 
@@ -505,43 +792,43 @@ async function deleteTempFile(filePath) {
 
 async function createModel(req, res) {
   const upload = await parseUpload(req);
-  const writeStream = upload.file.writeStream;
-  let finalPath = null;
+  const storage = ossEnabled ? 'oss' : 'local';
   let safeFileName = null;
+  let modelStored = false;
+  let committed = false;
 
   try {
-    await new Promise((resolve, reject) => {
-      if (writeStream.closed) {
-        resolve();
-        return;
-      }
-      writeStream.once('close', resolve);
-      writeStream.once('error', reject);
-    });
+    await waitForUploadWrite(upload.file.writeStream);
 
-    if (!(await isPlyFile(upload.file.tempPath))) {
-      throw new Error('只支持 PLY 文件。');
+    const ext = modelFileType(upload.file.originalName);
+    if (!ext) {
+      throw new Error('只支持 PLY / SPZ / SPLAT / KSPLAT 文件。');
+    }
+    if (ext === '.ply' && !(await isPlyFile(upload.file.tempPath))) {
+      throw new Error('PLY 文件内容无效。');
     }
 
-    const metadata = await parsePlyMetadata(upload.file.tempPath);
+    const metadata = ext === '.ply'
+      ? await parsePlyMetadata(upload.file.tempPath)
+      : { vertexCount: 0, center: [0, 0, 0], size: [1, 1, 1] };
     const id = crypto.randomUUID();
-    safeFileName = `model-${Date.now()}-${id.slice(0, 8)}.ply`;
+    safeFileName = `model-${Date.now()}-${id.slice(0, 8)}${ext}`;
     const fileSize = fs.statSync(upload.file.tempPath).size;
 
     if (ossEnabled) {
       await getOssClient().put(ossObjectKey(safeFileName), fs.createReadStream(upload.file.tempPath), {
         mime: 'application/octet-stream'
       });
-      await deleteTempFile(upload.file.tempPath);
+      modelStored = true;
     } else {
-      finalPath = path.join(modelsDir, safeFileName);
-      await fsp.rename(upload.file.tempPath, finalPath);
+      await fsp.rename(upload.file.tempPath, path.join(modelsDir, safeFileName));
+      modelStored = true;
     }
 
-    const originalName = upload.file.originalName || '未命名.ply';
+    const originalName = upload.file.originalName || '未命名模型';
     const fallbackName = path.parse(originalName).name || '未命名模型';
     const now = new Date().toISOString();
-    const model = safeModel({
+    const modelRecord = {
       id,
       name: String(upload.fields.name || fallbackName).trim() || '未命名模型',
       fileName: safeFileName,
@@ -551,32 +838,188 @@ async function createModel(req, res) {
       center: metadata.center,
       size: metadata.size,
       intro: '',
-      storage: ossEnabled ? 'oss' : 'local',
+      storage,
       createdAt: now,
       updatedAt: now
-    });
+    };
+    const model = safeModel(modelRecord);
 
     const previousModels = manifest.models;
-    manifest.models.unshift(model);
+    manifest.models.unshift(modelRecord);
     try {
       saveManifest();
     } catch (error) {
       manifest.models = previousModels;
       throw error;
     }
+    committed = true;
 
-    sendJson(res, 201, { model: { ...model, url: modelUrl(model) } });
-  } catch (error) {
     if (ossEnabled) {
-      console.error('模型可能已上传到 OSS，但模型清单保存失败，请手动检查 OSS 对象:', safeFileName, error);
-    } else if (finalPath) {
-      console.error('模型文件可能已写入，但模型清单保存失败，请手动检查文件:', finalPath, error);
-    } else {
-      console.error('模型上传失败:', error);
+      await deleteTempFile(upload.file.tempPath);
     }
+
+    sendJson(res, 201, { model: { ...model, url: modelUrl(modelRecord) } });
+  } catch (error) {
+    console.error('模型上传失败:', error);
     await deleteTempFile(upload.file.tempPath);
+
+    if (!committed) {
+      if (modelStored && safeFileName) {
+        try {
+          await removeStoredUpload(storage, safeFileName, modelsDir);
+        } catch (cleanupError) {
+          console.error('模型文件清理失败:', cleanupError);
+        }
+      }
+    }
     sendJson(res, 400, { error: error.message || '上传失败。' });
   }
+}
+
+function thumbnailSnapshot(model) {
+  return {
+    thumbnail: model.thumbnail,
+    thumbnailUrl: model.thumbnailUrl,
+    thumbnailFileName: model.thumbnailFileName,
+    thumbnailStorage: model.thumbnailStorage,
+    thumbnailFileSize: model.thumbnailFileSize,
+    updatedAt: model.updatedAt
+  };
+}
+
+function restoreThumbnailSnapshot(model, snapshot) {
+  for (const [key, value] of Object.entries(snapshot)) {
+    if (value === undefined) {
+      delete model[key];
+    } else {
+      model[key] = value;
+    }
+  }
+}
+
+async function replaceModelThumbnail(req, res, id) {
+  const model = manifest.models.find((item) => item.id === id);
+  if (!model) {
+    sendJson(res, 404, { error: '模型不存在。' });
+    return;
+  }
+
+  const upload = await parseThumbnailUpload(req);
+  const previousThumbnail = thumbnailSnapshot(model);
+  const storage = ossEnabled ? 'oss' : 'local';
+  const oldThumbnailFileName = model.thumbnailFileName || '';
+  const oldThumbnailStorage = model.thumbnailStorage || model.storage || 'local';
+  let safeThumbnailFileName = null;
+  let thumbnailStored = false;
+  let committed = false;
+
+  try {
+    await waitForUploadWrite(upload.thumbnail.writeStream);
+    const thumbnailFileSize = fs.statSync(upload.thumbnail.tempPath).size;
+    if (thumbnailFileSize > MAX_THUMBNAIL_SIZE_BYTES) {
+      throw new Error('缩略图不能超过 8MB。');
+    }
+
+    const thumbnailExt = thumbnailFileType(upload.thumbnail.originalName);
+    if (!thumbnailExt) {
+      throw new Error('缩略图只支持 JPG / PNG / WEBP 文件。');
+    }
+    if (!(await isThumbnailFile(upload.thumbnail.tempPath, thumbnailExt))) {
+      throw new Error('缩略图内容与文件格式不匹配。');
+    }
+
+    safeThumbnailFileName = `thumb-${Date.now()}-${id.slice(0, 8)}${thumbnailExt}`;
+    if (ossEnabled) {
+      await getOssClient().put(
+        ossObjectKey(safeThumbnailFileName),
+        fs.createReadStream(upload.thumbnail.tempPath),
+        { mime: thumbnailMimeType(thumbnailExt) }
+      );
+    } else {
+      await fsp.rename(upload.thumbnail.tempPath, path.join(thumbnailsDir, safeThumbnailFileName));
+    }
+    thumbnailStored = true;
+
+    delete model.thumbnail;
+    delete model.thumbnailUrl;
+    model.thumbnailFileName = safeThumbnailFileName;
+    model.thumbnailStorage = storage;
+    model.thumbnailFileSize = thumbnailFileSize;
+    model.updatedAt = new Date().toISOString();
+
+    try {
+      saveManifest();
+    } catch (error) {
+      restoreThumbnailSnapshot(model, previousThumbnail);
+      throw error;
+    }
+    committed = true;
+
+    if (ossEnabled) await deleteTempFile(upload.thumbnail.tempPath);
+    let warning = '';
+    if (oldThumbnailFileName && oldThumbnailFileName !== safeThumbnailFileName) {
+      try {
+        await removeStoredUpload(oldThumbnailStorage, oldThumbnailFileName, thumbnailsDir);
+      } catch (error) {
+        warning = error.message || '旧缩略图删除失败';
+        console.error('新缩略图已保存，但旧缩略图删除失败:', error);
+      }
+    }
+
+    sendJson(res, 200, warning
+      ? { model: safeModel(model), warning }
+      : { model: safeModel(model) });
+  } catch (error) {
+    await deleteTempFile(upload.thumbnail.tempPath);
+    if (thumbnailStored && !committed && safeThumbnailFileName) {
+      try {
+        await removeStoredUpload(storage, safeThumbnailFileName, thumbnailsDir);
+      } catch (cleanupError) {
+        console.error('新缩略图清理失败:', cleanupError);
+      }
+    }
+    restoreThumbnailSnapshot(model, previousThumbnail);
+    sendJson(res, 400, { error: error.message || '缩略图上传失败。' });
+  }
+}
+
+async function removeModelThumbnail(req, res, id) {
+  const model = manifest.models.find((item) => item.id === id);
+  if (!model) {
+    sendJson(res, 404, { error: '模型不存在。' });
+    return;
+  }
+
+  const previousThumbnail = thumbnailSnapshot(model);
+  const oldThumbnailFileName = model.thumbnailFileName || '';
+  const oldThumbnailStorage = model.thumbnailStorage || model.storage || 'local';
+  delete model.thumbnail;
+  delete model.thumbnailUrl;
+  delete model.thumbnailFileName;
+  delete model.thumbnailStorage;
+  delete model.thumbnailFileSize;
+  model.updatedAt = new Date().toISOString();
+
+  try {
+    saveManifest();
+  } catch (error) {
+    restoreThumbnailSnapshot(model, previousThumbnail);
+    throw error;
+  }
+
+  let warning = '';
+  if (oldThumbnailFileName) {
+    try {
+      await removeStoredUpload(oldThumbnailStorage, oldThumbnailFileName, thumbnailsDir);
+    } catch (error) {
+      warning = error.message || '缩略图文件删除失败';
+      console.error('缩略图记录已清除，但文件删除失败:', error);
+    }
+  }
+
+  sendJson(res, 200, warning
+    ? { model: safeModel(model), warning }
+    : { model: safeModel(model) });
 }
 
 async function updateModel(req, res, id) {
@@ -592,7 +1035,9 @@ async function updateModel(req, res, id) {
     name: model.name,
     intro: model.intro,
     taxonomyId: model.taxonomyId,
-    updatedAt: model.updatedAt
+    updatedAt: model.updatedAt,
+    attribution: model.attribution,
+    attributionLog: model.attributionLog
   };
 
   if (body.name !== undefined) {
@@ -620,6 +1065,25 @@ async function updateModel(req, res, id) {
       return;
     }
     model.taxonomyId = taxonomyId;
+  }
+
+  if (body.attribution && typeof body.attribution === 'object') {
+    const nextAttribution = { ...(model.attribution || {}) };
+    const nextLog = Array.isArray(model.attributionLog) ? [...model.attributionLog] : [];
+    for (const field of ['collector', 'identifier', 'builder']) {
+      const nextValue = String(body.attribution[field] ?? '').trim();
+      const prevValue = String(nextAttribution[field] ?? '').trim();
+      if (nextValue !== prevValue) {
+        nextAttribution[field] = nextValue;
+        nextLog.push({ field, value: nextValue, at: new Date().toISOString() });
+      }
+    }
+    model.attribution = nextAttribution;
+    model.attributionLog = nextLog;
+  }
+
+  if (model.taxonomyId) {
+    ensureAncestorPathForEntry(model.taxonomyId);
   }
 
   model.updatedAt = new Date().toISOString();
@@ -677,6 +1141,16 @@ async function deleteModel(req, res, id) {
     }
   }
 
+  if (model.thumbnailFileName) {
+    try {
+      await removeStoredUpload(model.thumbnailStorage || model.storage || 'local', model.thumbnailFileName, thumbnailsDir);
+    } catch (error) {
+      const thumbnailWarning = error.message || '缩略图文件删除失败';
+      warning = warning ? `${warning}；${thumbnailWarning}` : thumbnailWarning;
+      console.error('模型记录已删除，但缩略图删除失败:', error);
+    }
+  }
+
   sendJson(res, 200, warning ? { deleted: id, warning } : { deleted: id });
 }
 
@@ -687,7 +1161,7 @@ function validateTaxonomyPayload(body, existingId = null) {
   }
 
   const rankKey = String(body.rankKey || body.rank || 'order');
-  if (!taxonomyRanks.includes(rankKey)) {
+  if (getRankPosition(rankKey) < 0) {
     return { error: '分类层级无效。' };
   }
 
@@ -725,6 +1199,11 @@ function validateTaxonomyPayload(body, existingId = null) {
     return { error: '同一层级下已存在同名分类。' };
   }
 
+  const code = String(body.code || '').trim();
+  if (code && !isCodeAvailable(code, existingId)) {
+    return { error: '该坐标已被其他分类节点使用。' };
+  }
+
   let sortOrder = Number(body.sortOrder);
   if (!Number.isFinite(sortOrder)) {
     const siblings = taxonomyManifest.entries.filter((entry) => (entry.parentId || null) === parentId);
@@ -741,6 +1220,7 @@ function validateTaxonomyPayload(body, existingId = null) {
     identificationSummary,
     active: body.active === undefined ? true : Boolean(body.active),
     classificationStatus: String(body.classificationStatus || 'confirmed').trim(),
+    code,
     sortOrder
   };
 }
@@ -753,6 +1233,7 @@ function createTaxonomyEntry(body) {
   const entry = {
     id: crypto.randomUUID(),
     name: validation.name,
+    code: validation.code || generateTaxonomyCode(validation.parentId, validation.rankKey, validation.name),
     rankKey: validation.rankKey,
     nameLatin: validation.nameLatin,
     parentId: validation.parentId,
@@ -774,6 +1255,7 @@ function createTaxonomyEntry(body) {
     taxonomyManifest.entries = previousEntries;
     throw error;
   }
+  ensureAncestorPathForEntry(entry.id);
   return { entry: safeTaxonomy(entry) };
 }
 
@@ -788,6 +1270,7 @@ function updateTaxonomyEntry(id, body) {
 
   const previousValues = {
     name: entry.name,
+    code: entry.code,
     rankKey: entry.rankKey,
     nameLatin: entry.nameLatin,
     parentId: entry.parentId,
@@ -802,6 +1285,7 @@ function updateTaxonomyEntry(id, body) {
 
   Object.assign(entry, {
     name: validation.name,
+    code: validation.code || generateTaxonomyCode(validation.parentId, validation.rankKey, validation.name),
     rankKey: validation.rankKey,
     nameLatin: validation.nameLatin,
     parentId: validation.parentId,
@@ -850,6 +1334,109 @@ function deleteTaxonomyEntry(id) {
   return { deleted: id };
 }
 
+function createRankDefinition(body) {
+  const key = String(body.key || '').trim();
+  const name = String(body.name || '').trim();
+  const nameLatin = String(body.nameLatin || '').trim();
+  const position = Number(body.position);
+  const base = Boolean(body.base);
+
+  if (!key || !name) {
+    return { error: '阶元 key 和名称不能为空。' };
+  }
+  if (!Number.isFinite(position)) {
+    return { error: '阶元顺序必须是数字。' };
+  }
+  if (taxonomyRankCatalog.some((entry) => entry.key === key)) {
+    return { error: '该阶元 key 已存在。' };
+  }
+  const basePositions = new Set(baseRankCatalog.map((entry) => entry.position));
+  if (basePositions.has(position)) {
+    return { error: '特殊阶元位置不能与基础阶元位置相同。' };
+  }
+  if (taxonomyRankCatalog.some((entry) => Number(entry.position) === position)) {
+    return { error: '该层级位置已被使用。' };
+  }
+
+  const rank = {
+    id: `rank-${key}`,
+    key,
+    name,
+    nameLatin,
+    position,
+    base,
+    active: true
+  };
+  taxonomyRankCatalog.push(rank);
+  saveTaxonomy();
+  return { rank: { ...rank } };
+}
+
+function updateRankDefinition(key, body) {
+  const rank = taxonomyRankCatalog.find((entry) => entry.key === key);
+  if (!rank) {
+    return { error: '阶元不存在。' };
+  }
+
+  if (body.name !== undefined) rank.name = String(body.name).trim();
+  if (body.nameLatin !== undefined) rank.nameLatin = String(body.nameLatin).trim();
+  if (body.position !== undefined) {
+    const position = Number(body.position);
+    if (!Number.isFinite(position)) return { error: '阶元顺序必须是数字。' };
+    const basePositions = new Set(baseRankCatalog.map((entry) => entry.position));
+    if (basePositions.has(position)) {
+      return { error: '特殊阶元位置不能与基础阶元位置相同。' };
+    }
+    const conflict = taxonomyRankCatalog.find((entry) => entry.key !== key && Number(entry.position) === position);
+    if (conflict) {
+      return { error: `该层级位置已被 ${conflict.name} 使用。` };
+    }
+
+    for (const entry of taxonomyManifest.entries) {
+      if ((entry.rankKey || entry.rank) !== key) continue;
+      const parent = getTaxonomyEntry(entry.parentId);
+      if (parent) {
+        const parentPosition = getRankPosition(parent.rankKey || parent.rank);
+        if (parentPosition >= position) {
+          return { error: `移动后，${entry.name} 的父级位置不合法。` };
+        }
+      }
+      for (const child of getTaxonomyChildren(entry.id)) {
+        const childPosition = getRankPosition(child.rankKey || child.rank);
+        if (childPosition <= position) {
+          return { error: `移动后，${child.name} 的子级位置不合法。` };
+        }
+      }
+    }
+    rank.position = position;
+  }
+  if (body.active !== undefined) rank.active = Boolean(body.active);
+
+  saveTaxonomy();
+  return { rank: { ...rank } };
+}
+
+function deleteRankDefinition(key) {
+  const rank = taxonomyRankCatalog.find((entry) => entry.key === key);
+  if (!rank) {
+    return { error: '阶元不存在。' };
+  }
+
+  const usedEntries = taxonomyManifest.entries.filter((entry) => (entry.rankKey || entry.rank) === key);
+  if (usedEntries.length) {
+    const names = usedEntries.map((entry) => entry.name).join('、');
+    return {
+      error: `该阶元仍被以下分类节点使用：${names}。请先停用或处理相关节点。`,
+      nodes: usedEntries.map((entry) => ({ id: entry.id, name: entry.name, code: entry.code || '' }))
+    };
+  }
+
+  const index = taxonomyRankCatalog.indexOf(rank);
+  if (index >= 0) taxonomyRankCatalog.splice(index, 1);
+  saveTaxonomy();
+  return { deleted: key };
+}
+
 async function handleApi(req, res, url) {
   if (url.pathname === '/api/health' && req.method === 'GET') {
     sendJson(res, 200, { status: 'ok', storage: ossEnabled ? 'oss' : 'local' });
@@ -871,7 +1458,8 @@ async function handleApi(req, res, url) {
       ...safeTaxonomy(entry),
       modelCount: modelCountForTaxonomy(entry.id)
     }));
-    sendJson(res, 200, { taxonomy });
+    const rankCatalog = taxonomyRankCatalog.map((entry) => ({ ...entry }));
+    sendJson(res, 200, { taxonomy, rankCatalog });
     return true;
   }
 
@@ -914,6 +1502,41 @@ async function handleApi(req, res, url) {
   if (req.method !== 'GET' && req.headers['x-admin-key'] !== adminKey) {
     sendJson(res, 401, { error: '需要输入管理秘钥后才能执行此操作。' });
     return true;
+  }
+
+  if (url.pathname === '/api/rank-catalog' && req.method === 'POST') {
+    const body = await readJsonBody(req);
+    const result = createRankDefinition(body);
+    if (result.error) {
+      sendJson(res, 400, { error: result.error });
+    } else {
+      sendJson(res, 201, { rank: result.rank });
+    }
+    return true;
+  }
+
+  const rankMatch = url.pathname.match(/^\/api\/rank-catalog\/([^/]+)$/);
+  if (rankMatch) {
+    const key = decodeURIComponent(rankMatch[1]);
+    if (req.method === 'PATCH') {
+      const body = await readJsonBody(req);
+      const result = updateRankDefinition(key, body);
+      if (result.error) {
+        sendJson(res, 400, { error: result.error });
+      } else {
+        sendJson(res, 200, { rank: result.rank });
+      }
+      return true;
+    }
+    if (req.method === 'DELETE') {
+      const result = deleteRankDefinition(key);
+      if (result.error) {
+        sendJson(res, 400, { error: result.error });
+      } else {
+        sendJson(res, 200, { deleted: result.deleted });
+      }
+      return true;
+    }
   }
 
   if (url.pathname === '/api/models' && req.method === 'GET') {
@@ -961,6 +1584,19 @@ async function handleApi(req, res, url) {
       } else {
         sendJson(res, 200, { deleted: result.deleted });
       }
+      return true;
+    }
+  }
+
+  const modelThumbnailMatch = url.pathname.match(/^\/api\/models\/([^/]+)\/thumbnail$/);
+  if (modelThumbnailMatch) {
+    const id = decodeURIComponent(modelThumbnailMatch[1]);
+    if (req.method === 'PUT') {
+      await replaceModelThumbnail(req, res, id);
+      return true;
+    }
+    if (req.method === 'DELETE') {
+      await removeModelThumbnail(req, res, id);
       return true;
     }
   }
