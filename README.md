@@ -20,9 +20,9 @@ http://127.0.0.1:4173
 http://127.0.0.1:4173/admin.html
 ```
 
-模型元数据保存在 `data/models.json`。上传的 PLY 默认保存在 `models/`，配置阿里云 OSS 后会自动切换到 OSS。
+模型元数据保存在 `data/models.json`，分类数据保存在 `data/taxonomy.json`，静态缩略图保存在 `thumbs/`。仓库只保存这些程序所需的元数据和预览资源，不提交 `.ply`、`.splat`、`.ksplat`、`.spz` 等 3D 模型文件。
 
-仓库初始模型列表为空，不包含测试模型。首次启动后可在管理后台上传新的 PLY 模型。
+实际模型文件保存在阿里云 OSS，或在未配置 OSS 时保存到 ECS 的 `models/` 目录。模型二进制已被 `.gitignore` 排除，便于以后独立批量替换模型而不改动代码仓库。
 
 后台编辑操作需要输入管理秘钥，秘钥可通过环境变量 `ADMIN_KEY` 配置。
 
