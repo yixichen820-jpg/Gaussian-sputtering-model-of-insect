@@ -149,7 +149,6 @@ const mobileHomeSearch = document.getElementById('mobile-home-search');
 const mobileSearchSuggestions = document.getElementById('mobile-search-suggestions');
 const mobileQuickCategories = document.getElementById('mobile-quick-categories');
 const mobileFeaturedList = document.getElementById('mobile-featured-list');
-const mobileIdentifiedList = document.getElementById('mobile-identified-list');
 const mobileIdentifiedCount = document.getElementById('mobile-identified-count');
 const mobileHomeStats = document.getElementById('mobile-home-stats');
 const mobileAboutStats = document.getElementById('mobile-about-stats');
@@ -412,29 +411,6 @@ function getIdentifiedModels() {
   return allModels.filter((model) => Boolean(model.intro?.trim()));
 }
 
-function createMobileIdentifiedCard(model) {
-  const card = document.createElement('button');
-  card.type = 'button';
-  card.className = 'mobile-identified-card';
-  card.append(createModelThumbnail(model));
-
-  const copy = document.createElement('span');
-  copy.className = 'mobile-identified-copy';
-  const name = document.createElement('strong');
-  name.textContent = model.name;
-  const taxonomy = document.createElement('em');
-  taxonomy.textContent = model.taxonomyName
-    ? getTaxonomyPath(model.taxonomyId).slice(-2).join(' · ')
-    : '分类信息待整理';
-  const intro = document.createElement('small');
-  intro.textContent = model.intro.trim();
-  copy.append(name, taxonomy, intro);
-
-  card.append(copy, createTaxonomyIcon('arrow-right'));
-  card.addEventListener('click', () => openMobileSpecimen(model));
-  return card;
-}
-
 function createMobileFeaturedCard(model) {
   const card = document.createElement('button');
   card.type = 'button';
@@ -479,13 +455,17 @@ function createMobileStat(value, label) {
 function getMobileStats() {
   const representedOrders = getDefaultOrderRoots()
     .filter((entry) => getMobileTaxonomyModelCount(entry.id) > 0).length;
-  const modelsWithThumbnails = allModels.filter(hasModelThumbnail).length;
+  const completeLifecycleSpecies = new Set(
+    Array.isArray(museumUiConfig.completeLifecycleSpeciesIds)
+      ? museumUiConfig.completeLifecycleSpeciesIds.filter(Boolean)
+      : []
+  ).size;
 
   return [
     { value: allModels.length, label: '已完成馆藏' },
     { value: getIdentifiedModels().length, label: '已鉴定馆藏' },
     { value: representedOrders, label: '已收录目级分类' },
-    { value: modelsWithThumbnails, label: '已有静态缩略图' }
+    { value: completeLifecycleSpecies, label: '已录入完整生命周期物种数' }
   ];
 }
 
@@ -537,7 +517,6 @@ function renderMobileHome() {
 
   const identifiedModels = getIdentifiedModels();
   mobileIdentifiedCount.textContent = `${identifiedModels.length} 件`;
-  mobileIdentifiedList.replaceChildren(...identifiedModels.map(createMobileIdentifiedCard));
 
   const stats = getMobileStats();
   mobileHomeStats.replaceChildren(...stats.slice(0, 2).map((stat) => {
@@ -628,6 +607,45 @@ function getMobileTaxonomyRoots() {
   return taxonomy
     .filter((entry) => !entry.parentId && entry.active !== false)
     .sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+}
+
+function getFirstModelForTaxonomy(taxonomyId) {
+  const ids = new Set(getTaxonomyDescendantIds(taxonomyId));
+  const matches = allModels.filter((model) => ids.has(model.taxonomyId));
+  return matches.find(hasModelThumbnail) || matches[0] || null;
+}
+
+function createMobileCategorySectionHeading(title, meta) {
+  const heading = document.createElement('div');
+  heading.className = 'mobile-category-section-heading';
+  const strong = document.createElement('strong');
+  strong.textContent = title;
+  const small = document.createElement('span');
+  small.textContent = meta;
+  heading.append(strong, small);
+  return heading;
+}
+
+function createMobileOrderCard(entry) {
+  const count = getMobileTaxonomyModelCount(entry.id);
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'mobile-order-card';
+  button.disabled = count === 0;
+  button.append(createModelThumbnail(getFirstModelForTaxonomy(entry.id), 'mobile-order-image'));
+
+  const copy = document.createElement('span');
+  copy.className = 'mobile-order-copy';
+  const name = document.createElement('strong');
+  name.textContent = entry.name;
+  const meta = document.createElement('small');
+  meta.textContent = `${entry.rankLabel || entry.rank || '目'} · ${count} 件馆藏`;
+  copy.append(name, meta);
+  button.append(copy, createTaxonomyIcon(count ? 'chevron-right' : 'minus'));
+  button.addEventListener('click', () => {
+    if (count > 0) openMobileCatalog({ filterId: entry.id, query: '' });
+  });
+  return button;
 }
 
 function createMobileTaxonomyTreeRow(entry, depth = 0) {
@@ -731,7 +749,7 @@ function renderMobileCategory() {
     : [];
 
   renderMobileCategoryBreadcrumb(currentEntry);
-  mobileCategoryTitle.textContent = '完整分类树';
+  mobileCategoryTitle.textContent = '分类浏览';
   mobileCategorySearch.value = mobileCategoryQuery;
   mobileCategoryCount.textContent = `${allModels.length} 件馆藏`;
 
@@ -745,9 +763,20 @@ function renderMobileCategory() {
       mobileTaxonomyList.replaceChildren(empty);
     }
   } else {
-    mobileTaxonomyList.replaceChildren(
-      ...getMobileTaxonomyRoots().map((entry) => createMobileTaxonomyTreeRow(entry))
+    const fragment = document.createDocumentFragment();
+    const orderHeading = createMobileCategorySectionHeading(
+      '目级分类',
+      `${getDefaultOrderRoots().length} 个目`
     );
+    const orderList = document.createElement('div');
+    orderList.className = 'mobile-order-list';
+    orderList.append(...getDefaultOrderRoots().map(createMobileOrderCard));
+    const treeHeading = createMobileCategorySectionHeading('完整分类树', '默认折叠');
+    const treeList = document.createElement('div');
+    treeList.className = 'mobile-taxonomy-tree';
+    treeList.append(...getMobileTaxonomyRoots().map((entry) => createMobileTaxonomyTreeRow(entry)));
+    fragment.append(orderHeading, orderList, treeHeading, treeList);
+    mobileTaxonomyList.replaceChildren(fragment);
   }
 
   const currentCount = currentEntry ? getMobileTaxonomyModelCount(currentEntry.id) : 0;

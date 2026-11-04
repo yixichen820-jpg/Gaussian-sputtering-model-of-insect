@@ -2753,83 +2753,10 @@ h1 {
     background: #e8ecdf;
   }
 
-  .mobile-identified-section > p {
-    margin: 0 0 12px;
-    color: var(--mm-ink-soft);
-    font-size: 12px;
-    line-height: 1.65;
-  }
-
   .mobile-identified-count {
     color: var(--mm-forest);
     font-family: "Songti SC", "STSong", Georgia, serif;
     font-size: 22px;
-  }
-
-  .mobile-identified-list {
-    display: grid;
-    gap: 8px;
-  }
-
-  .mobile-identified-card {
-    display: grid;
-    min-width: 0;
-    min-height: 78px;
-    grid-template-columns: 64px minmax(0, 1fr) 20px;
-    align-items: center;
-    gap: 10px;
-    padding: 7px;
-    border: 1px solid rgba(50, 84, 59, 0.13);
-    border-radius: 12px;
-    color: var(--mm-ink);
-    background: rgba(255, 255, 255, 0.52);
-    text-align: center;
-  }
-
-  .mobile-identified-card img {
-    width: 64px;
-    height: 62px;
-    object-fit: cover;
-    border-radius: 8px;
-    background: #d9d9ce;
-  }
-
-  .mobile-identified-copy {
-    display: grid;
-    min-width: 0;
-    gap: 2px;
-    text-align: left;
-  }
-
-  .mobile-identified-copy strong,
-  .mobile-identified-copy em,
-  .mobile-identified-copy small {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .mobile-identified-copy strong {
-    font-family: "Songti SC", "STSong", Georgia, serif;
-    font-size: 15px;
-  }
-
-  .mobile-identified-copy em {
-    color: var(--mm-clay);
-    font-family: Georgia, serif;
-    font-size: 9px;
-    font-style: italic;
-  }
-
-  .mobile-identified-copy small {
-    color: var(--mm-ink-soft);
-    font-size: 9px;
-  }
-
-  .mobile-identified-card > svg {
-    width: 16px;
-    height: 16px;
-    color: var(--mm-moss);
   }
 
   .mobile-about-card {
@@ -3228,6 +3155,87 @@ h1 {
     gap: 5px;
   }
 
+  .mobile-category-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 18px 0 7px;
+    padding: 0 2px;
+  }
+
+  .mobile-category-section-heading:first-child {
+    margin-top: 0;
+  }
+
+  .mobile-category-section-heading strong {
+    color: var(--mm-ink);
+    font-family: "Songti SC", "STSong", Georgia, serif;
+    font-size: 20px;
+  }
+
+  .mobile-category-section-heading span {
+    color: var(--mm-moss);
+    font-size: 10px;
+  }
+
+  .mobile-order-list,
+  .mobile-taxonomy-tree {
+    display: grid;
+    gap: 7px;
+  }
+
+  .mobile-order-card {
+    display: grid;
+    min-height: 78px;
+    grid-template-columns: 62px minmax(0, 1fr) 22px;
+    align-items: center;
+    gap: 10px;
+    padding: 7px;
+    border: 1px solid var(--mm-line);
+    border-radius: 13px;
+    color: var(--mm-ink);
+    background: var(--mm-paper-strong);
+    text-align: left;
+  }
+
+  .mobile-order-card:disabled {
+    opacity: 0.56;
+  }
+
+  .mobile-order-image {
+    width: 62px;
+    height: 62px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #d9d9ce;
+  }
+
+  .mobile-order-copy {
+    display: grid;
+    min-width: 0;
+    gap: 3px;
+  }
+
+  .mobile-order-copy strong {
+    overflow: hidden;
+    font-family: "Songti SC", "STSong", Georgia, serif;
+    font-size: 17px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobile-order-copy small {
+    color: var(--mm-moss);
+    font-size: 10px;
+  }
+
+  .mobile-order-card > svg {
+    width: 16px;
+    height: 16px;
+    color: var(--mm-moss);
+  }
+
   .mobile-taxonomy-node,
   .mobile-taxonomy-children {
     display: grid;
@@ -3402,6 +3410,8 @@ h1 {
   .mobile-about-hero h1 {
     margin: 8px 0 12px;
     font-size: 34px;
+    color: var(--mm-ink);
+    text-shadow: none;
   }
 
   .mobile-about-hero p,
