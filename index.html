@@ -221,6 +221,291 @@
       </main>
     </section>
 
+    <section class="mobile-museum" id="mobile-museum" aria-label="昆虫数字自然博物馆">
+      <div class="mobile-view" id="mobile-home-view" data-mobile-view="home">
+        <header class="mobile-home-header">
+          <button class="mobile-brand" id="mobile-home-brand" type="button">
+            <span class="mobile-brand-mark"><i data-lucide="leaf"></i></span>
+            <span>
+              <strong>昆虫数字自然博物馆</strong>
+              <small>INSECT DIGITAL MUSEUM</small>
+            </span>
+          </button>
+          <button class="mobile-round-button" id="mobile-home-about" type="button" aria-label="查看博物馆介绍">
+            <i data-lucide="menu"></i>
+          </button>
+        </header>
+
+        <div class="mobile-scroll" id="mobile-home-scroll">
+          <section class="mobile-hero" id="mobile-hero">
+            <img class="mobile-hero-image" id="mobile-hero-image" alt="" />
+            <div class="mobile-hero-shade"></div>
+            <div class="mobile-hero-content">
+              <span class="mobile-hero-kicker">DIGITAL NATURAL HISTORY</span>
+              <h1><span>探索昆虫的</span><br /><span>微观世界</span></h1>
+              <p>一座随身携带的昆虫三维数字自然博物馆</p>
+              <button class="mobile-hero-link" id="mobile-hero-open" type="button">
+                <span id="mobile-hero-name">精选馆藏</span>
+                <i data-lucide="arrow-right"></i>
+              </button>
+            </div>
+          </section>
+
+          <form class="mobile-search-form" id="mobile-home-search-form" role="search">
+            <i data-lucide="search"></i>
+            <input id="mobile-home-search" type="search" placeholder="搜索昆虫名称、学名或分类" autocomplete="off" />
+            <button type="submit" aria-label="开始搜索"><i data-lucide="arrow-right"></i></button>
+          </form>
+          <div class="mobile-search-suggestions" id="mobile-search-suggestions" hidden></div>
+
+          <section class="mobile-section mobile-quick-section">
+            <div class="mobile-section-head">
+              <div>
+                <span class="mobile-eyebrow">QUICK ACCESS</span>
+                <h2>探索馆藏</h2>
+              </div>
+            </div>
+            <div class="mobile-quick-grid" id="mobile-quick-categories"></div>
+          </section>
+
+          <section class="mobile-section">
+            <div class="mobile-section-head">
+              <div>
+                <span class="mobile-eyebrow">FEATURED COLLECTION</span>
+                <h2>精选馆藏</h2>
+              </div>
+              <button class="mobile-text-button" id="mobile-all-collection" type="button">查看全部</button>
+            </div>
+            <div class="mobile-featured-list" id="mobile-featured-list"></div>
+          </section>
+
+          <section class="mobile-section">
+            <div class="mobile-section-head">
+              <div>
+                <span class="mobile-eyebrow">CATALOGUE PREVIEW</span>
+                <h2>馆藏目录</h2>
+              </div>
+              <span class="mobile-section-count" id="mobile-home-model-count"></span>
+            </div>
+            <div class="mobile-catalog-preview" id="mobile-catalog-preview"></div>
+          </section>
+
+          <section class="mobile-section mobile-progress-section" id="mobile-progress-section">
+            <div class="mobile-section-head">
+              <div>
+                <span class="mobile-eyebrow">IN PREPARATION</span>
+                <h2>制作中的馆藏</h2>
+              </div>
+              <span class="mobile-progress-count" id="mobile-progress-count">5 项</span>
+            </div>
+            <p>新标本正在采集、重建与数字化整理中，完成后会进入正式馆藏。</p>
+            <div class="mobile-progress-list" id="mobile-progress-list"></div>
+          </section>
+
+          <details class="mobile-about-card" id="mobile-home-about-details">
+            <summary>
+              <span><i data-lucide="info"></i> 关于数字自然博物馆</span>
+              <i data-lucide="chevron-down"></i>
+            </summary>
+            <p>这里以昆虫三维形态观察和物种档案为核心，让自然史收藏更易检索、更容易被理解。</p>
+            <div class="mobile-home-stats" id="mobile-home-stats"></div>
+          </details>
+
+          <footer class="mobile-home-footer">
+            <span>V8.7</span>
+            <a href="/changelog.html">更新日志</a>
+            <span>CYC联合创建</span>
+          </footer>
+        </div>
+      </div>
+
+      <div class="mobile-view" id="mobile-catalog-view" data-mobile-view="catalog" hidden>
+        <header class="mobile-view-header">
+          <button class="mobile-round-button" id="mobile-catalog-back" type="button" aria-label="返回首页">
+            <i data-lucide="arrow-left"></i>
+          </button>
+          <div class="mobile-view-title">
+            <span>COLLECTION</span>
+            <strong id="mobile-catalog-title">全部馆藏</strong>
+          </div>
+          <button class="mobile-round-button" id="mobile-catalog-category" type="button" aria-label="打开分类浏览">
+            <i data-lucide="list-tree"></i>
+          </button>
+        </header>
+        <div class="mobile-scroll" id="mobile-catalog-scroll">
+          <label class="mobile-search-form mobile-catalog-search">
+            <i data-lucide="search"></i>
+            <input id="mobile-catalog-search" type="search" placeholder="搜索馆藏、学名或分类" autocomplete="off" />
+          </label>
+          <div class="mobile-active-filter" id="mobile-active-filter" hidden>
+            <span id="mobile-active-filter-label"></span>
+            <button id="mobile-active-filter-clear" type="button">清除筛选</button>
+          </div>
+          <div class="mobile-catalog-meta">
+            <span id="mobile-catalog-total">共 0 件馆藏</span>
+            <span>点击展签进入三维观察</span>
+          </div>
+          <div class="mobile-specimen-list" id="mobile-catalog-list"></div>
+          <div class="mobile-empty-state" id="mobile-catalog-empty" hidden>当前条件下没有匹配的馆藏。</div>
+          <div class="mobile-pagination" id="mobile-catalog-pagination">
+            <button id="mobile-catalog-prev" type="button" aria-label="上一页"><i data-lucide="chevron-left"></i></button>
+            <span id="mobile-catalog-page"></span>
+            <button id="mobile-catalog-next" type="button" aria-label="下一页"><i data-lucide="chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mobile-view" id="mobile-category-view" data-mobile-view="category" hidden>
+        <header class="mobile-view-header">
+          <button class="mobile-round-button" id="mobile-category-back" type="button" aria-label="返回上一级">
+            <i data-lucide="arrow-left"></i>
+          </button>
+          <div class="mobile-view-title">
+            <span>TAXONOMY</span>
+            <strong>分类浏览</strong>
+          </div>
+          <button class="mobile-round-button" id="mobile-category-home" type="button" aria-label="返回首页">
+            <i data-lucide="house"></i>
+          </button>
+        </header>
+        <div class="mobile-scroll" id="mobile-category-scroll">
+          <nav class="mobile-breadcrumb" id="mobile-category-breadcrumb" aria-label="当前分类路径"></nav>
+          <div class="mobile-category-heading">
+            <div>
+              <span class="mobile-eyebrow">BROWSE THE COLLECTION</span>
+              <h1 id="mobile-category-title">目级分类</h1>
+            </div>
+            <span id="mobile-category-count"></span>
+          </div>
+          <label class="mobile-search-form mobile-category-search">
+            <i data-lucide="search"></i>
+            <input id="mobile-category-search" type="search" placeholder="搜索当前分类" autocomplete="off" />
+          </label>
+          <div class="mobile-taxonomy-list" id="mobile-taxonomy-list"></div>
+          <div class="mobile-category-action">
+            <p id="mobile-category-summary"></p>
+            <button id="mobile-category-view-models" type="button">查看该分类下的馆藏</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mobile-view" id="mobile-about-view" data-mobile-view="about" hidden>
+        <header class="mobile-view-header">
+          <button class="mobile-round-button" id="mobile-about-back" type="button" aria-label="返回首页">
+            <i data-lucide="arrow-left"></i>
+          </button>
+          <div class="mobile-view-title">
+            <span>ABOUT THE MUSEUM</span>
+            <strong>关于我们</strong>
+          </div>
+          <span class="mobile-header-mark"><i data-lucide="leaf"></i></span>
+        </header>
+        <div class="mobile-scroll" id="mobile-about-scroll">
+          <section class="mobile-about-hero">
+            <span class="mobile-eyebrow">DIGITAL NATURAL HISTORY</span>
+            <h1>让自然收藏<br />触手可及</h1>
+            <p>以昆虫三维形态和物种档案为核心，建立一座随时可以进入的数字自然博物馆。</p>
+          </section>
+          <section class="mobile-about-stats" id="mobile-about-stats"></section>
+          <section class="mobile-about-section">
+            <h2>我们如何组织馆藏</h2>
+            <p>正式馆藏用于浏览已完成的三维模型；制作中的内容单独展示，不被标记为可观察馆藏。</p>
+          </section>
+          <section class="mobile-about-section">
+            <h2>观察方式</h2>
+            <p>进入模型后，单指旋转，双指缩放和平移。复位、自动旋转和全屏操作都位于底部工具区。</p>
+          </section>
+          <section class="mobile-about-section">
+            <h2>项目说明</h2>
+            <p>模型文件由 OSS 独立管理，网页代码与三维资源分开维护，便于后续持续补充馆藏。</p>
+          </section>
+          <footer class="mobile-home-footer">
+            <a href="/admin.html">管理界面</a>
+            <a href="/changelog.html">V8.7 更新日志</a>
+            <span>CYC联合创建</span>
+          </footer>
+        </div>
+      </div>
+
+      <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="移动端主导航">
+        <button class="is-active" type="button" data-mobile-nav="home">
+          <i data-lucide="house"></i><span>首页</span>
+        </button>
+        <button type="button" data-mobile-nav="catalog">
+          <i data-lucide="layout-grid"></i><span>馆藏</span>
+        </button>
+        <button type="button" data-mobile-nav="category">
+          <i data-lucide="list-tree"></i><span>分类</span>
+        </button>
+        <button type="button" data-mobile-nav="about">
+          <i data-lucide="info"></i><span>关于</span>
+        </button>
+      </nav>
+
+      <div class="mobile-detail-chrome" id="mobile-detail-chrome" hidden>
+        <header class="mobile-detail-topbar">
+          <button class="mobile-round-button" id="mobile-detail-back" type="button" aria-label="返回馆藏目录">
+            <i data-lucide="arrow-left"></i>
+          </button>
+          <div class="mobile-detail-heading">
+            <span>3D SPECIMEN VIEW</span>
+            <strong id="mobile-detail-top-title">物种观察</strong>
+          </div>
+          <button class="mobile-round-button" id="mobile-detail-help" type="button" aria-label="查看操作说明">
+            <i data-lucide="circle-help"></i>
+          </button>
+        </header>
+        <div class="mobile-detail-status" id="mobile-detail-status">准备加载</div>
+        <section class="mobile-detail-sheet is-collapsed" id="mobile-detail-sheet">
+          <button class="mobile-sheet-handle" id="mobile-sheet-toggle" type="button" aria-label="展开物种档案">
+            <span></span>
+          </button>
+          <div class="mobile-detail-summary">
+            <div class="mobile-detail-titleline">
+              <div>
+                <h1 id="mobile-detail-name">物种名称</h1>
+                <p id="mobile-detail-latin"></p>
+              </div>
+              <span class="mobile-3d-badge">3D</span>
+            </div>
+            <div class="mobile-detail-tags" id="mobile-detail-tags"></div>
+          </div>
+          <div class="mobile-detail-tools">
+            <button id="mobile-action-rotate" type="button" aria-pressed="true"><i data-lucide="rotate-cw"></i><span>旋转</span></button>
+            <button id="mobile-action-zoom" type="button"><i data-lucide="zoom-in"></i><span>缩放</span></button>
+            <button id="mobile-action-reset" type="button"><i data-lucide="locate-fixed"></i><span>复位</span></button>
+            <button id="mobile-action-fullscreen" type="button"><i data-lucide="maximize"></i><span>全屏</span></button>
+          </div>
+          <div class="mobile-detail-archive" id="mobile-detail-archive" hidden>
+            <section>
+              <h2>物种档案</h2>
+              <p id="mobile-detail-intro"></p>
+            </section>
+            <section>
+              <h2>分类路径</h2>
+              <p id="mobile-detail-taxonomy"></p>
+            </section>
+            <section>
+              <h2>标本署名</h2>
+              <dl class="mobile-attribution" id="mobile-detail-attribution"></dl>
+            </section>
+          </div>
+        </section>
+      </div>
+
+      <div class="mobile-help-modal" id="mobile-help-modal" hidden>
+        <div class="mobile-help-card">
+          <button class="mobile-round-button" id="mobile-help-close" type="button" aria-label="关闭操作说明">
+            <i data-lucide="x"></i>
+          </button>
+          <span class="mobile-eyebrow">TOUCH TO EXPLORE</span>
+          <h2>观察三维标本</h2>
+          <p>单指拖动旋转模型，双指捏合缩放，双指移动调整位置。</p>
+          <button class="mobile-primary-button" id="mobile-help-confirm" type="button">开始观察</button>
+        </div>
+      </div>
+    </section>
+
     <div class="site-utility">
       <a class="admin-entry" id="admin-link" href="/admin.html" aria-label="进入管理界面">
         <i data-lucide="settings-2"></i>

@@ -2,16 +2,23 @@ import * as GaussianSplats3D from '@mkkellogg/gaussian-splats-3d';
 import * as THREE from 'three';
 import replaceElement from './node_modules/lucide/dist/esm/replaceElement.mjs';
 import ArrowLeft from './node_modules/lucide/dist/esm/icons/arrow-left.mjs';
+import ArrowRight from './node_modules/lucide/dist/esm/icons/arrow-right.mjs';
 import Box from './node_modules/lucide/dist/esm/icons/box.mjs';
 import Bug from './node_modules/lucide/dist/esm/icons/bug.mjs';
 import ChevronDown from './node_modules/lucide/dist/esm/icons/chevron-down.mjs';
 import ChevronLeft from './node_modules/lucide/dist/esm/icons/chevron-left.mjs';
 import ChevronRight from './node_modules/lucide/dist/esm/icons/chevron-right.mjs';
 import ChevronUp from './node_modules/lucide/dist/esm/icons/chevron-up.mjs';
+import CircleHelp from './node_modules/lucide/dist/esm/icons/circle-question-mark.mjs';
 import Funnel from './node_modules/lucide/dist/esm/icons/funnel.mjs';
+import House from './node_modules/lucide/dist/esm/icons/house.mjs';
+import Info from './node_modules/lucide/dist/esm/icons/info.mjs';
+import LayoutGrid from './node_modules/lucide/dist/esm/icons/layout-grid.mjs';
+import Leaf from './node_modules/lucide/dist/esm/icons/leaf.mjs';
 import ListTree from './node_modules/lucide/dist/esm/icons/list-tree.mjs';
 import LocateFixed from './node_modules/lucide/dist/esm/icons/locate-fixed.mjs';
 import Maximize from './node_modules/lucide/dist/esm/icons/maximize.mjs';
+import Menu from './node_modules/lucide/dist/esm/icons/menu.mjs';
 import Minus from './node_modules/lucide/dist/esm/icons/minus.mjs';
 import Moon from './node_modules/lucide/dist/esm/icons/moon.mjs';
 import PanelLeftClose from './node_modules/lucide/dist/esm/icons/panel-left-close.mjs';
@@ -22,20 +29,28 @@ import Settings2 from './node_modules/lucide/dist/esm/icons/settings-2.mjs';
 import Share2 from './node_modules/lucide/dist/esm/icons/share-2.mjs';
 import Sun from './node_modules/lucide/dist/esm/icons/sun.mjs';
 import X from './node_modules/lucide/dist/esm/icons/x.mjs';
+import ZoomIn from './node_modules/lucide/dist/esm/icons/zoom-in.mjs';
 import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
 
 const icons = {
   ArrowLeft,
+  ArrowRight,
   Box,
   Bug,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   ChevronUp,
+  CircleHelp,
   Filter: Funnel,
+  House,
+  Info,
+  LayoutGrid,
+  Leaf,
   ListTree,
   LocateFixed,
   Maximize,
+  Menu,
   Minus,
   Moon,
   PanelLeftClose,
@@ -45,7 +60,8 @@ const icons = {
   Settings2,
   Share2,
   Sun,
-  X
+  X,
+  ZoomIn
 };
 
 function createIcons({ root = document } = {}) {
@@ -111,6 +127,67 @@ const catalogPrev = document.getElementById('catalog-prev');
 const catalogNext = document.getElementById('catalog-next');
 const catalogPageNumbers = document.getElementById('catalog-page-numbers');
 const catalogBack = document.getElementById('catalog-back');
+const mobileViews = {
+  home: document.getElementById('mobile-home-view'),
+  catalog: document.getElementById('mobile-catalog-view'),
+  category: document.getElementById('mobile-category-view'),
+  about: document.getElementById('mobile-about-view')
+};
+const mobileScrolls = {
+  home: document.getElementById('mobile-home-scroll'),
+  catalog: document.getElementById('mobile-catalog-scroll'),
+  category: document.getElementById('mobile-category-scroll'),
+  about: document.getElementById('mobile-about-scroll')
+};
+const mobileBottomNav = document.getElementById('mobile-bottom-nav');
+const mobileHero = document.getElementById('mobile-hero');
+const mobileHeroImage = document.getElementById('mobile-hero-image');
+const mobileHeroName = document.getElementById('mobile-hero-name');
+const mobileHeroOpen = document.getElementById('mobile-hero-open');
+const mobileHomeSearchForm = document.getElementById('mobile-home-search-form');
+const mobileHomeSearch = document.getElementById('mobile-home-search');
+const mobileSearchSuggestions = document.getElementById('mobile-search-suggestions');
+const mobileQuickCategories = document.getElementById('mobile-quick-categories');
+const mobileFeaturedList = document.getElementById('mobile-featured-list');
+const mobileCatalogPreview = document.getElementById('mobile-catalog-preview');
+const mobileHomeModelCount = document.getElementById('mobile-home-model-count');
+const mobileProgressList = document.getElementById('mobile-progress-list');
+const mobileProgressCount = document.getElementById('mobile-progress-count');
+const mobileHomeStats = document.getElementById('mobile-home-stats');
+const mobileAboutStats = document.getElementById('mobile-about-stats');
+const mobileCatalogTitle = document.getElementById('mobile-catalog-title');
+const mobileCatalogSearch = document.getElementById('mobile-catalog-search');
+const mobileActiveFilter = document.getElementById('mobile-active-filter');
+const mobileActiveFilterLabel = document.getElementById('mobile-active-filter-label');
+const mobileActiveFilterClear = document.getElementById('mobile-active-filter-clear');
+const mobileCatalogTotal = document.getElementById('mobile-catalog-total');
+const mobileCatalogList = document.getElementById('mobile-catalog-list');
+const mobileCatalogEmpty = document.getElementById('mobile-catalog-empty');
+const mobileCatalogPagination = document.getElementById('mobile-catalog-pagination');
+const mobileCatalogPrev = document.getElementById('mobile-catalog-prev');
+const mobileCatalogNext = document.getElementById('mobile-catalog-next');
+const mobileCatalogPageLabel = document.getElementById('mobile-catalog-page');
+const mobileCategoryBreadcrumb = document.getElementById('mobile-category-breadcrumb');
+const mobileCategoryTitle = document.getElementById('mobile-category-title');
+const mobileCategoryCount = document.getElementById('mobile-category-count');
+const mobileCategorySearch = document.getElementById('mobile-category-search');
+const mobileTaxonomyList = document.getElementById('mobile-taxonomy-list');
+const mobileCategorySummary = document.getElementById('mobile-category-summary');
+const mobileCategoryViewModels = document.getElementById('mobile-category-view-models');
+const mobileDetailChrome = document.getElementById('mobile-detail-chrome');
+const mobileDetailStatus = document.getElementById('mobile-detail-status');
+const mobileDetailSheet = document.getElementById('mobile-detail-sheet');
+const mobileDetailTopTitle = document.getElementById('mobile-detail-top-title');
+const mobileDetailName = document.getElementById('mobile-detail-name');
+const mobileDetailLatin = document.getElementById('mobile-detail-latin');
+const mobileDetailTags = document.getElementById('mobile-detail-tags');
+const mobileDetailArchive = document.getElementById('mobile-detail-archive');
+const mobileDetailIntro = document.getElementById('mobile-detail-intro');
+const mobileDetailTaxonomy = document.getElementById('mobile-detail-taxonomy');
+const mobileDetailAttribution = document.getElementById('mobile-detail-attribution');
+const mobileSheetToggle = document.getElementById('mobile-sheet-toggle');
+const mobileActionRotate = document.getElementById('mobile-action-rotate');
+const mobileHelpModal = document.getElementById('mobile-help-modal');
 const sidePanelHomeParent = sidePanel.parentNode;
 const sidePanelHomeNextSibling = sidePanel.nextSibling;
 
@@ -132,6 +209,20 @@ let catalogPage = 1;
 let catalogPageSize = 12;
 let catalogQuery = '';
 let catalogTargetModelId = null;
+let museumUiConfig = {};
+let mobileView = 'home';
+let mobilePreviousView = 'catalog';
+let mobileCatalogPage = 1;
+let mobileCatalogQuery = '';
+let mobileCatalogFilterId = null;
+let mobileCategoryId = null;
+let mobileCategoryQuery = '';
+let mobileSearchTimer = null;
+let mobileLoadStatusText = '准备加载';
+let mobileLoadProgress = 0;
+const mobileScrollPositions = new Map();
+const MOBILE_MUSEUM_QUERY = '(max-width: 1023px)';
+const MOBILE_CATALOG_PAGE_SIZE = 8;
 const expandedTaxonomyIds = new Set();
 const expandedCatalogIds = new Set();
 let ancestorSectionOpen = false;
@@ -144,18 +235,23 @@ createIcons({ icons });
 function setStatus(text, state = 'loading') {
   statusText.textContent = text;
   statusDot.className = 'status-dot';
+  mobileLoadStatusText = text;
 
   if (state === 'ready') {
     statusDot.classList.add('is-ready');
   } else if (state === 'error') {
     statusDot.classList.add('is-error');
   }
+
+  renderMobileLoadStatus();
 }
 
 function setProgress(percent) {
   const normalized = Math.max(0, Math.min(100, Number(percent) || 0));
   progressFill.style.width = `${normalized}%`;
   progressTrack.style.opacity = normalized >= 100 ? '0' : '1';
+  mobileLoadProgress = normalized;
+  renderMobileLoadStatus();
 }
 
 function setModelInfo(index) {
@@ -172,7 +268,8 @@ function setModelInfo(index) {
 }
 
 function getModelThumbnail(model) {
-  return model?.thumbnail || `/thumbs/${encodeURIComponent(model?.id || '')}.jpg`;
+  if (!model) return '/thumbs/placeholder.svg';
+  return model.thumbnail || `/thumbs/${encodeURIComponent(model.id)}.jpg`;
 }
 
 function createModelThumbnail(model, className = '') {
@@ -187,6 +284,636 @@ function createModelThumbnail(model, className = '') {
     image.src = '/thumbs/placeholder.svg';
   }, { once: true });
   return image;
+}
+
+function isMobileMuseum() {
+  return window.matchMedia(MOBILE_MUSEUM_QUERY).matches;
+}
+
+function renderMobileLoadStatus() {
+  if (!mobileDetailStatus) return;
+  const progress = mobileLoadProgress > 0 && mobileLoadProgress < 100
+    ? ` · ${Math.round(mobileLoadProgress)}%`
+    : '';
+  mobileDetailStatus.textContent = `${mobileLoadStatusText}${progress}`;
+}
+
+function getModelScientificName(model) {
+  if (!model) return '';
+  const configured = museumUiConfig.latinNames?.[model.id];
+  if (configured) return configured;
+
+  const intro = model.intro || '';
+  const explicitName = intro.match(/[（(]学名[：:]\s*([^）)]+)[）)]/);
+  if (explicitName?.[1]) return explicitName[1].trim();
+
+  const leadingName = intro.match(/^[^（(]{1,30}[（(]([A-Z][A-Za-z×.\s,-]{4,})[）)]/);
+  return leadingName?.[1]?.trim() || '';
+}
+
+function getTaxonomyPathEntries(taxonomyId) {
+  const path = [];
+  const seen = new Set();
+  let current = getTaxonomyEntry(taxonomyId);
+  while (current && !seen.has(current.id)) {
+    seen.add(current.id);
+    path.unshift(current);
+    current = current.parentId ? getTaxonomyEntry(current.parentId) : null;
+  }
+  return path;
+}
+
+function getMobileTaxonomyModelCount(taxonomyId) {
+  const ids = new Set(getTaxonomyDescendantIds(taxonomyId));
+  return allModels.filter((model) => ids.has(model.taxonomyId)).length;
+}
+
+function getFirstModelForTaxonomy(taxonomyId) {
+  const ids = new Set(getTaxonomyDescendantIds(taxonomyId));
+  return allModels.find((model) => ids.has(model.taxonomyId)) || null;
+}
+
+function getMobileCatalogModels() {
+  const allowedIds = mobileCatalogFilterId
+    ? new Set(getTaxonomyDescendantIds(mobileCatalogFilterId))
+    : null;
+  const needle = mobileCatalogQuery.trim().toLocaleLowerCase('zh-CN');
+
+  return allModels.filter((model) => {
+    if (allowedIds && !allowedIds.has(model.taxonomyId)) return false;
+    if (!needle) return true;
+
+    const searchable = [
+      model.name,
+      model.taxonomyName,
+      getTaxonomyPath(model.taxonomyId).join(' '),
+      getModelScientificName(model)
+    ].join(' ').toLocaleLowerCase('zh-CN');
+    return searchable.includes(needle);
+  });
+}
+
+function createMobileSpecimenCard(model) {
+  const card = document.createElement('button');
+  card.type = 'button';
+  card.className = 'mobile-specimen-card';
+  card.dataset.modelId = model.id;
+
+  const imageWrap = document.createElement('span');
+  imageWrap.className = 'mobile-specimen-card-image';
+  imageWrap.append(createModelThumbnail(model));
+
+  const copy = document.createElement('span');
+  copy.className = 'mobile-specimen-copy';
+  const name = document.createElement('strong');
+  name.textContent = model.name;
+  copy.append(name);
+
+  const scientificName = getModelScientificName(model);
+  if (scientificName) {
+    const latin = document.createElement('span');
+    latin.className = 'mobile-specimen-latin';
+    latin.textContent = scientificName;
+    copy.append(latin);
+  }
+
+  const taxonomy = document.createElement('span');
+  taxonomy.className = 'mobile-specimen-taxonomy';
+  taxonomy.textContent = model.taxonomyName
+    ? getTaxonomyPath(model.taxonomyId).join(' · ')
+    : '分类信息待整理';
+  copy.append(taxonomy);
+
+  const enter = document.createElement('span');
+  enter.className = 'mobile-specimen-enter';
+  enter.append(createTaxonomyIcon('arrow-right'));
+
+  card.append(imageWrap, copy, enter);
+  card.addEventListener('click', () => openMobileSpecimen(model));
+  return card;
+}
+
+function createMobilePreviewRow(model) {
+  const row = document.createElement('button');
+  row.type = 'button';
+  row.className = 'mobile-catalog-preview-row';
+  row.append(createModelThumbnail(model));
+
+  const copy = document.createElement('span');
+  const name = document.createElement('strong');
+  name.textContent = model.name;
+  const meta = document.createElement('small');
+  meta.textContent = model.taxonomyName
+    ? getTaxonomyPath(model.taxonomyId).join(' · ')
+    : '分类信息待整理';
+  copy.append(name, meta);
+  row.append(copy, createTaxonomyIcon('arrow-right'));
+  row.addEventListener('click', () => openMobileSpecimen(model));
+  return row;
+}
+
+function createMobileFeaturedCard(model) {
+  const card = document.createElement('button');
+  card.type = 'button';
+  card.className = 'mobile-featured-card';
+
+  const copy = document.createElement('span');
+  copy.className = 'mobile-featured-copy';
+  const name = document.createElement('strong');
+  name.textContent = model.name;
+  copy.append(name);
+
+  const scientificName = getModelScientificName(model);
+  if (scientificName) {
+    const latin = document.createElement('em');
+    latin.textContent = scientificName;
+    copy.append(latin);
+  }
+
+  const meta = document.createElement('small');
+  meta.textContent = model.taxonomyName
+    ? getTaxonomyPath(model.taxonomyId).slice(-2).join(' · ')
+    : '分类信息待整理';
+  copy.append(meta);
+
+  const image = createModelThumbnail(model, 'mobile-featured-image');
+  card.append(copy, image);
+  card.addEventListener('click', () => openMobileSpecimen(model));
+  return card;
+}
+
+function createMobileStat(value, label) {
+  const stat = document.createElement('div');
+  stat.className = 'mobile-stat';
+  const strong = document.createElement('strong');
+  strong.textContent = String(value);
+  const span = document.createElement('span');
+  span.textContent = label;
+  stat.append(strong, span);
+  return stat;
+}
+
+function getMobileStats() {
+  const representedOrders = getDefaultOrderRoots()
+    .filter((entry) => getMobileTaxonomyModelCount(entry.id) > 0).length;
+  const modelsWithThumbnails = allModels.filter((model) => {
+    return model.thumbnail && !model.thumbnail.includes('placeholder');
+  }).length;
+
+  return [
+    { value: allModels.length, label: '已完成馆藏' },
+    { value: Number(museumUiConfig.inProgressCount) || museumUiConfig.inProgress?.length || 0, label: '制作中' },
+    { value: representedOrders, label: '已收录目级分类' },
+    { value: modelsWithThumbnails, label: '已有静态缩略图' }
+  ];
+}
+
+function renderMobileHome() {
+  if (!allModels.length) return;
+
+  const configuredFeatured = allModels.find((model) => model.id === museumUiConfig.featuredModelId);
+  const featured = configuredFeatured
+    || allModels.find((model) => model.thumbnail && !model.thumbnail.includes('placeholder'))
+    || allModels[0];
+  if (featured) {
+    mobileHeroName.textContent = featured.name;
+    mobileHeroImage.src = getModelThumbnail(featured);
+    mobileHeroImage.alt = `${featured.name}静态缩略图`;
+    mobileHero.classList.remove('is-placeholder');
+    mobileHeroImage.onerror = () => {
+      mobileHero.classList.add('is-placeholder');
+      mobileHeroImage.removeAttribute('src');
+    };
+    mobileHeroOpen.onclick = () => openMobileSpecimen(featured);
+  }
+
+  const quickEntries = [
+    { label: '全部馆藏', meta: `${allModels.length} 件`, icon: 'layout-grid', action: () => openMobileCatalog() },
+    { label: '分类浏览', meta: '逐级检索', icon: 'list-tree', action: () => openMobileCategory() },
+    {
+      label: '制作中',
+      meta: `${Number(museumUiConfig.inProgressCount) || 0} 项`,
+      icon: 'box',
+      action: () => document.getElementById('mobile-progress-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    },
+    { label: '关于我们', meta: '项目说明', icon: 'info', action: () => showMobileView('about') }
+  ];
+
+  mobileQuickCategories.replaceChildren(...quickEntries.map((entry) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'mobile-quick-button';
+    const iconWrap = document.createElement('span');
+    iconWrap.append(createTaxonomyIcon(entry.icon));
+    const label = document.createElement('strong');
+    label.textContent = entry.label;
+    const meta = document.createElement('small');
+    meta.textContent = entry.meta;
+    button.append(iconWrap, label, meta);
+    button.addEventListener('click', entry.action);
+    return button;
+  }));
+
+  const featuredModels = [
+    featured,
+    ...allModels.filter((model) => model.id !== featured?.id)
+  ].filter(Boolean).slice(0, 2);
+  mobileFeaturedList.replaceChildren(...featuredModels.map(createMobileFeaturedCard));
+
+  mobileCatalogPreview.replaceChildren(...allModels.slice(0, 4).map(createMobilePreviewRow));
+  mobileHomeModelCount.textContent = `${allModels.length} 件正式馆藏`;
+
+  const progressCount = Number(museumUiConfig.inProgressCount) || museumUiConfig.inProgress?.length || 0;
+  mobileProgressCount.textContent = `${progressCount} 项`;
+  const progressSlots = Array.from({ length: progressCount }, (_, index) => {
+    const slot = document.createElement('div');
+    slot.className = 'mobile-progress-slot';
+    slot.append(createTaxonomyIcon('box'));
+    const label = document.createElement('span');
+    label.textContent = `档案整理 ${String(index + 1).padStart(2, '0')}`;
+    slot.append(label);
+    return slot;
+  });
+  mobileProgressList.replaceChildren(...progressSlots);
+
+  const stats = getMobileStats();
+  mobileHomeStats.replaceChildren(...stats.slice(0, 2).map((stat) => {
+    return createMobileStat(stat.value, stat.label);
+  }));
+  mobileAboutStats.replaceChildren(...stats.map((stat) => {
+    return createMobileStat(stat.value, stat.label);
+  }));
+
+  createIcons({ icons });
+}
+
+function renderMobileCatalog() {
+  const filtered = getMobileCatalogModels();
+  const pageCount = Math.max(1, Math.ceil(filtered.length / MOBILE_CATALOG_PAGE_SIZE));
+  mobileCatalogPage = Math.min(Math.max(1, mobileCatalogPage), pageCount);
+  const start = (mobileCatalogPage - 1) * MOBILE_CATALOG_PAGE_SIZE;
+  const pageModels = filtered.slice(start, start + MOBILE_CATALOG_PAGE_SIZE);
+  const filterEntry = getTaxonomyEntry(mobileCatalogFilterId);
+
+  mobileCatalogTitle.textContent = filterEntry?.name || '全部馆藏';
+  mobileCatalogSearch.value = mobileCatalogQuery;
+  mobileCatalogTotal.textContent = `共 ${filtered.length} 件馆藏`;
+  mobileCatalogList.replaceChildren(...pageModels.map(createMobileSpecimenCard));
+  mobileCatalogList.hidden = pageModels.length === 0;
+  mobileCatalogEmpty.hidden = pageModels.length !== 0;
+  mobileCatalogPagination.hidden = pageCount <= 1 || filtered.length === 0;
+  mobileCatalogPrev.disabled = mobileCatalogPage <= 1;
+  mobileCatalogNext.disabled = mobileCatalogPage >= pageCount;
+  mobileCatalogPageLabel.textContent = `${mobileCatalogPage} / ${pageCount}`;
+
+  mobileActiveFilter.hidden = !filterEntry;
+  if (filterEntry) {
+    mobileActiveFilterLabel.textContent = getTaxonomyPath(filterEntry.id).join(' › ');
+  }
+  createIcons({ icons });
+}
+
+function renderMobileCategoryBreadcrumb(currentEntry) {
+  mobileCategoryBreadcrumb.replaceChildren();
+
+  const rootButton = document.createElement('button');
+  rootButton.type = 'button';
+  rootButton.textContent = '分类浏览';
+  rootButton.addEventListener('click', () => {
+    mobileCategoryId = null;
+    mobileCategoryQuery = '';
+    mobileCategorySearch.value = '';
+    renderMobileCategory();
+  });
+  mobileCategoryBreadcrumb.append(rootButton);
+
+  if (!currentEntry) return;
+  getTaxonomyPathEntries(currentEntry.id).forEach((entry) => {
+    const separator = document.createElement('span');
+    separator.className = 'mobile-breadcrumb-separator';
+    separator.textContent = '›';
+    separator.setAttribute('aria-hidden', 'true');
+    mobileCategoryBreadcrumb.append(separator);
+
+    if (entry.id === currentEntry.id) {
+      const current = document.createElement('span');
+      current.textContent = entry.name;
+      current.setAttribute('aria-current', 'page');
+      mobileCategoryBreadcrumb.append(current);
+      return;
+    }
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = entry.name;
+    button.addEventListener('click', () => {
+      mobileCategoryId = entry.id;
+      mobileCategoryQuery = '';
+      mobileCategorySearch.value = '';
+      renderMobileCategory();
+    });
+    mobileCategoryBreadcrumb.append(button);
+  });
+}
+
+function renderMobileCategory() {
+  let currentEntry = getTaxonomyEntry(mobileCategoryId);
+  if (mobileCategoryId && !currentEntry) {
+    mobileCategoryId = null;
+  }
+
+  const children = currentEntry
+    ? sortedTaxonomyChildren(currentEntry.id)
+    : getDefaultOrderRoots();
+  const needle = mobileCategoryQuery.trim().toLocaleLowerCase('zh-CN');
+  const visibleChildren = needle
+    ? children.filter((entry) => {
+      const searchable = [entry.name, entry.keyText || '', entry.rankLabel || ''].join(' ')
+        .toLocaleLowerCase('zh-CN');
+      return searchable.includes(needle);
+    })
+    : children;
+
+  renderMobileCategoryBreadcrumb(currentEntry);
+  mobileCategoryTitle.textContent = currentEntry?.name || '目级分类';
+  mobileCategorySearch.value = mobileCategoryQuery;
+
+  const currentCount = currentEntry
+    ? getMobileTaxonomyModelCount(currentEntry.id)
+    : allModels.length;
+  mobileCategoryCount.textContent = `${currentCount} 件馆藏`;
+
+  mobileTaxonomyList.replaceChildren(...visibleChildren.map((entry) => {
+    const childCount = getMobileTaxonomyModelCount(entry.id);
+    const entryChildren = sortedTaxonomyChildren(entry.id);
+    const previewModel = getFirstModelForTaxonomy(entry.id);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'mobile-taxonomy-item';
+    button.classList.toggle('is-active', Boolean(mobileCatalogFilterId && mobileCatalogFilterId === entry.id));
+    button.append(createModelThumbnail(previewModel, 'mobile-taxonomy-image'));
+
+    const copy = document.createElement('span');
+    copy.className = 'mobile-taxonomy-copy';
+    const name = document.createElement('strong');
+    name.textContent = entry.name;
+    const rank = document.createElement('em');
+    rank.textContent = `${entry.rankLabel || entry.rank || '分类'}${entryChildren.length ? ' · 含下级分类' : ''}`;
+    const count = document.createElement('small');
+    count.textContent = `${childCount} 件馆藏`;
+    copy.append(name, rank, count);
+    button.append(copy, createTaxonomyIcon('chevron-right'));
+
+    button.addEventListener('click', () => {
+      if (entryChildren.length) {
+        mobileCategoryId = entry.id;
+        mobileCategoryQuery = '';
+        mobileCategorySearch.value = '';
+        renderMobileCategory();
+        mobileScrolls.category.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      openMobileCatalog({ filterId: entry.id });
+    });
+    return button;
+  }));
+
+  mobileCategorySummary.textContent = currentEntry
+    ? `${getTaxonomyPath(currentEntry.id).join(' › ')}，共收录 ${currentCount} 件三维馆藏。`
+    : `从目级分类开始逐级浏览，当前共有 ${allModels.length} 件正式馆藏。`;
+  mobileCategoryViewModels.disabled = currentCount === 0;
+  mobileCategoryViewModels.textContent = currentCount
+    ? `查看该分类下的馆藏（${currentCount}）`
+    : '该分类暂无馆藏';
+
+  createIcons({ icons });
+}
+
+function showMobileView(view, { restoreScroll = true } = {}) {
+  if (!mobileViews[view]) return;
+  if (document.body.classList.contains('mobile-detail-mode')) {
+    document.body.classList.remove('mobile-detail-mode');
+    mobileDetailChrome.hidden = true;
+  }
+
+  if (mobileScrolls[mobileView]) {
+    mobileScrollPositions.set(mobileView, mobileScrolls[mobileView].scrollTop);
+  }
+
+  Object.entries(mobileViews).forEach(([name, element]) => {
+    element.hidden = name !== view;
+  });
+  mobileView = view;
+
+  if (view === 'home') renderMobileHome();
+  if (view === 'catalog') renderMobileCatalog();
+  if (view === 'category') renderMobileCategory();
+  if (view === 'about') {
+    mobileAboutStats.replaceChildren(...getMobileStats().map((stat) => {
+      return createMobileStat(stat.value, stat.label);
+    }));
+  }
+
+  mobileBottomNav.querySelectorAll('[data-mobile-nav]').forEach((button) => {
+    button.classList.toggle('is-active', button.dataset.mobileNav === view);
+  });
+  mobileScrolls[view].scrollTop = restoreScroll ? (mobileScrollPositions.get(view) || 0) : 0;
+  createIcons({ icons });
+}
+
+function openMobileCatalog({ filterId = mobileCatalogFilterId, query = mobileCatalogQuery } = {}) {
+  mobileCatalogFilterId = filterId || null;
+  mobileCatalogQuery = query || '';
+  mobileCatalogPage = 1;
+  hideMobileSearchSuggestions();
+  showMobileView('catalog', { restoreScroll: false });
+}
+
+function openMobileCategory(categoryId = mobileCategoryId) {
+  mobileCategoryId = getTaxonomyEntry(categoryId)?.id || null;
+  mobileCategoryQuery = '';
+  mobileCategorySearch.value = '';
+  showMobileView('category', { restoreScroll: false });
+}
+
+function hideMobileSearchSuggestions() {
+  mobileSearchSuggestions.hidden = true;
+  mobileSearchSuggestions.replaceChildren();
+}
+
+function getMobileSearchResults(query) {
+  const needle = query.trim().toLocaleLowerCase('zh-CN');
+  if (!needle) return { models: [], taxonomy: [] };
+
+  const models = allModels.filter((model) => {
+    const searchable = [
+      model.name,
+      model.taxonomyName,
+      getTaxonomyPath(model.taxonomyId).join(' '),
+      getModelScientificName(model)
+    ].join(' ').toLocaleLowerCase('zh-CN');
+    return searchable.includes(needle);
+  }).slice(0, 5);
+
+  const taxonomyResults = taxonomy.filter((entry) => {
+    if (entry.active === false) return false;
+    const searchable = [entry.name, entry.keyText || '', entry.rankLabel || ''].join(' ')
+      .toLocaleLowerCase('zh-CN');
+    return searchable.includes(needle);
+  }).slice(0, 4);
+
+  return { models, taxonomy: taxonomyResults };
+}
+
+function renderMobileSearchSuggestions(query) {
+  const results = getMobileSearchResults(query);
+  const entries = [
+    ...results.models.map((model) => ({ type: 'model', model })),
+    ...results.taxonomy.map((entry) => ({ type: 'taxonomy', entry }))
+  ];
+
+  if (!entries.length) {
+    const empty = document.createElement('div');
+    empty.className = 'mobile-search-suggestion';
+    empty.textContent = '没有找到匹配的馆藏或分类';
+    mobileSearchSuggestions.replaceChildren(empty);
+    mobileSearchSuggestions.hidden = false;
+    return;
+  }
+
+  mobileSearchSuggestions.replaceChildren(...entries.map((item) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'mobile-search-suggestion';
+    button.append(createTaxonomyIcon(item.type === 'model' ? 'box' : 'list-tree'));
+
+    const copy = document.createElement('span');
+    const title = document.createElement('strong');
+    const meta = document.createElement('small');
+    if (item.type === 'model') {
+      title.textContent = item.model.name;
+      meta.textContent = item.model.taxonomyName
+        ? getTaxonomyPath(item.model.taxonomyId).slice(-2).join(' · ')
+        : '分类信息待整理';
+    } else {
+      title.textContent = `${item.entry.name} · ${item.entry.rankLabel || item.entry.rank || '分类'}`;
+      meta.textContent = `${getMobileTaxonomyModelCount(item.entry.id)} 件馆藏`;
+    }
+    copy.append(title, meta);
+    button.append(copy);
+    button.addEventListener('click', () => {
+      if (item.type === 'model') {
+        openMobileCatalog({ query: item.model.name });
+      } else {
+        openMobileCategory(item.entry.id);
+      }
+    });
+    return button;
+  }));
+  mobileSearchSuggestions.hidden = false;
+  createIcons({ icons });
+}
+
+function updateMobileDetail(model) {
+  if (!model) return;
+  const scientificName = getModelScientificName(model);
+  const path = getTaxonomyPath(model.taxonomyId);
+
+  mobileDetailTopTitle.textContent = model.name;
+  mobileDetailName.textContent = model.name;
+  mobileDetailLatin.textContent = scientificName || '学名资料待补充';
+
+  const tags = [
+    model.taxonomyName || '分类待整理',
+    `${formatter.format(model.splatCount || 0)} 个高斯点`
+  ].filter(Boolean);
+  mobileDetailTags.replaceChildren(...tags.map((value) => {
+    const tag = document.createElement('span');
+    tag.textContent = value;
+    return tag;
+  }));
+
+  mobileDetailIntro.textContent = model.intro?.trim() || '该馆藏暂未录入物种介绍。';
+  mobileDetailTaxonomy.textContent = path.join(' › ');
+  mobileDetailAttribution.replaceChildren();
+  Object.entries(ATTRIBUTION_FIELDS).forEach(([field, label]) => {
+    const row = document.createElement('div');
+    const term = document.createElement('dt');
+    term.textContent = label;
+    const description = document.createElement('dd');
+    description.textContent = model.attribution?.[field]?.trim() || '—';
+    row.append(term, description);
+    mobileDetailAttribution.append(row);
+  });
+
+  mobileDetailSheet.classList.add('is-collapsed');
+  mobileDetailSheet.classList.remove('is-expanded');
+  mobileDetailArchive.hidden = true;
+  mobileSheetToggle.setAttribute('aria-label', '展开物种档案');
+}
+
+async function openMobileSpecimen(model) {
+  const index = allModels.findIndex((item) => item.id === model.id);
+  if (index < 0) return;
+
+  mobilePreviousView = mobileView;
+  if (mobileScrolls[mobileView]) {
+    mobileScrollPositions.set(mobileView, mobileScrolls[mobileView].scrollTop);
+  }
+  updateMobileDetail(model);
+  hideMobileSearchSuggestions();
+  document.body.classList.add('mobile-detail-mode');
+  mobileDetailChrome.hidden = false;
+  mobileHelpModal.hidden = true;
+  models = allModels;
+  taxonomyFilterId = null;
+  updateActiveFilter();
+
+  await switchModel(index);
+}
+
+function closeMobileDetail() {
+  document.body.classList.remove('mobile-detail-mode');
+  mobileDetailChrome.hidden = true;
+  mobileHelpModal.hidden = true;
+  const targetView = mobileViews[mobilePreviousView] ? mobilePreviousView : 'catalog';
+  showMobileView(targetView);
+}
+
+function toggleMobileDetailSheet() {
+  const expanded = mobileDetailSheet.classList.contains('is-collapsed');
+  mobileDetailSheet.classList.toggle('is-collapsed', !expanded);
+  mobileDetailSheet.classList.toggle('is-expanded', expanded);
+  mobileDetailArchive.hidden = !expanded;
+  mobileSheetToggle.setAttribute('aria-label', expanded ? '收起物种档案' : '展开物种档案');
+}
+
+function syncMobileMuseumMode({ render = false } = {}) {
+  const mobile = isMobileMuseum();
+  document.body.classList.toggle('mobile-museum-active', mobile);
+
+  if (mobile && render) {
+    renderMobileHome();
+    renderMobileCatalog();
+    renderMobileCategory();
+    showMobileView(mobileView, { restoreScroll: true });
+  }
+
+  if (!mobile) {
+    document.body.classList.remove('mobile-detail-mode');
+    mobileDetailChrome.hidden = true;
+    mobileHelpModal.hidden = true;
+  }
+}
+
+async function loadMuseumUi() {
+  try {
+    const response = await fetchWithRetry('/museum-ui.json', 1);
+    museumUiConfig = response.ok ? await response.json() : {};
+  } catch (error) {
+    museumUiConfig = {};
+    console.warn('博物馆界面配置未加载，将使用现有数据中的默认值。', error);
+  }
 }
 
 function showStagePrompt() {
@@ -1092,6 +1819,10 @@ function frameCurrentModel() {
   if (!viewer || !viewer.controls || !viewer.camera || !models[activeIndex]) return;
 
   const frame = getCameraFrame(models[activeIndex]);
+  if (document.body.classList.contains('mobile-detail-mode') && isMobileMuseum()) {
+    const offset = frame.position.clone().sub(frame.target).multiplyScalar(1.18);
+    frame.position.copy(frame.target).add(offset);
+  }
   viewer.camera.up.set(0, 1, 0);
   viewer.camera.position.copy(frame.position);
   viewer.camera.lookAt(frame.target);
@@ -1584,10 +2315,24 @@ async function fetchWithRetry(url, retries = 3) {
 
 async function initialize() {
   try {
-    await Promise.all([loadModels(), loadTaxonomy()]);
+    await Promise.all([loadModels(), loadTaxonomy(), loadMuseumUi()]);
 
     if (models.length === 0) {
       setStatus('暂无模型', 'error');
+      return;
+    }
+
+    if (isMobileMuseum()) {
+      syncMobileMuseumMode();
+      showMobileView('home', { restoreScroll: false });
+      setStatus('等待选择模型', 'loading');
+      setProgress(0);
+      showStagePrompt();
+
+      if (requestedModel) {
+        const sharedModel = allModels.find((model) => model.id === requestedModel);
+        if (sharedModel) await openMobileSpecimen(sharedModel);
+      }
       return;
     }
 
@@ -1644,11 +2389,189 @@ catalogNext.addEventListener('click', () => {
 
 catalogBack.addEventListener('click', openCatalog);
 
+mobileBottomNav.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-mobile-nav]');
+  if (!button) return;
+
+  const target = button.dataset.mobileNav;
+  if (target === 'category') {
+    openMobileCategory();
+  } else {
+    showMobileView(target);
+  }
+});
+
+document.getElementById('mobile-home-brand').addEventListener('click', () => {
+  showMobileView('home', { restoreScroll: false });
+});
+
+document.getElementById('mobile-home-about').addEventListener('click', () => {
+  showMobileView('about');
+});
+
+document.getElementById('mobile-all-collection').addEventListener('click', () => {
+  openMobileCatalog({ filterId: null, query: '' });
+});
+
+mobileHomeSearchForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  openMobileCatalog({ filterId: null, query: mobileHomeSearch.value });
+});
+
+mobileHomeSearch.addEventListener('input', () => {
+  window.clearTimeout(mobileSearchTimer);
+  const query = mobileHomeSearch.value;
+  if (!query.trim()) {
+    hideMobileSearchSuggestions();
+    return;
+  }
+  mobileSearchTimer = window.setTimeout(() => renderMobileSearchSuggestions(query), 140);
+});
+
+mobileHomeSearch.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    mobileHomeSearch.value = '';
+    hideMobileSearchSuggestions();
+    mobileHomeSearch.blur();
+  }
+});
+
+document.addEventListener('click', (event) => {
+  if (!event.target.closest('#mobile-home-search-form, #mobile-search-suggestions')) {
+    hideMobileSearchSuggestions();
+  }
+});
+
+mobileCatalogSearch.addEventListener('input', () => {
+  mobileCatalogQuery = mobileCatalogSearch.value;
+  mobileCatalogPage = 1;
+  renderMobileCatalog();
+});
+
+mobileActiveFilterClear.addEventListener('click', () => {
+  mobileCatalogFilterId = null;
+  mobileCatalogPage = 1;
+  renderMobileCatalog();
+});
+
+document.getElementById('mobile-catalog-back').addEventListener('click', () => {
+  showMobileView('home');
+});
+
+document.getElementById('mobile-catalog-category').addEventListener('click', () => {
+  openMobileCategory(mobileCatalogFilterId);
+});
+
+mobileCatalogPrev.addEventListener('click', () => {
+  if (mobileCatalogPage <= 1) return;
+  mobileCatalogPage -= 1;
+  renderMobileCatalog();
+  mobileScrolls.catalog.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+mobileCatalogNext.addEventListener('click', () => {
+  mobileCatalogPage += 1;
+  renderMobileCatalog();
+  mobileScrolls.catalog.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+document.getElementById('mobile-category-back').addEventListener('click', () => {
+  const currentEntry = getTaxonomyEntry(mobileCategoryId);
+  if (!currentEntry || currentEntry.rankKey === 'order') {
+    showMobileView('home');
+    return;
+  }
+  mobileCategoryId = currentEntry.parentId || null;
+  mobileCategoryQuery = '';
+  mobileCategorySearch.value = '';
+  renderMobileCategory();
+});
+
+document.getElementById('mobile-category-home').addEventListener('click', () => {
+  showMobileView('home');
+});
+
+mobileCategorySearch.addEventListener('input', () => {
+  mobileCategoryQuery = mobileCategorySearch.value;
+  renderMobileCategory();
+});
+
+mobileCategoryViewModels.addEventListener('click', () => {
+  openMobileCatalog({ filterId: mobileCategoryId, query: '' });
+});
+
+document.getElementById('mobile-about-back').addEventListener('click', () => {
+  showMobileView('home');
+});
+
+document.getElementById('mobile-detail-back').addEventListener('click', closeMobileDetail);
+mobileSheetToggle.addEventListener('click', toggleMobileDetailSheet);
+
+document.getElementById('mobile-detail-help').addEventListener('click', () => {
+  mobileHelpModal.hidden = false;
+  createIcons({ icons });
+});
+
+document.getElementById('mobile-help-close').addEventListener('click', () => {
+  mobileHelpModal.hidden = true;
+});
+
+document.getElementById('mobile-help-confirm').addEventListener('click', () => {
+  mobileHelpModal.hidden = true;
+});
+
+mobileActionRotate.addEventListener('click', () => {
+  if (!viewer?.controls) return;
+  viewer.controls.autoRotate = !viewer.controls.autoRotate;
+  mobileActionRotate.setAttribute('aria-pressed', String(viewer.controls.autoRotate));
+  autoRotateButton.setAttribute('aria-pressed', String(viewer.controls.autoRotate));
+});
+
+document.getElementById('mobile-action-zoom').addEventListener('click', () => {
+  if (!viewer?.camera || !viewer.controls) return;
+  const target = viewer.controls.target;
+  const offset = viewer.camera.position.clone().sub(target).multiplyScalar(0.78);
+  viewer.camera.position.copy(target).add(offset);
+  viewer.camera.lookAt(target);
+  viewer.controls.update();
+});
+
+document.getElementById('mobile-action-reset').addEventListener('click', () => {
+  frameCurrentModel();
+});
+
+document.getElementById('mobile-action-fullscreen').addEventListener('click', async () => {
+  try {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+    } else {
+      await document.documentElement.requestFullscreen();
+    }
+  } catch (error) {
+    console.error(error);
+    showToast('当前浏览器无法进入全屏');
+  }
+});
+
+let mobileMode = isMobileMuseum();
+window.addEventListener('resize', () => {
+  const nextMobileMode = isMobileMuseum();
+  if (nextMobileMode === mobileMode) return;
+  mobileMode = nextMobileMode;
+
+  if (nextMobileMode) {
+    syncMobileMuseumMode({ render: allModels.length > 0 });
+  } else {
+    syncMobileMuseumMode();
+  }
+});
+
 autoRotateButton.addEventListener('click', () => {
   if (!viewer || !viewer.controls) return;
 
   viewer.controls.autoRotate = !viewer.controls.autoRotate;
   autoRotateButton.setAttribute('aria-pressed', String(viewer.controls.autoRotate));
+  mobileActionRotate.setAttribute('aria-pressed', String(viewer.controls.autoRotate));
 });
 
 resetViewButton.addEventListener('click', () => {
@@ -1670,6 +2593,10 @@ fullscreenButton.addEventListener('click', async () => {
 
 document.addEventListener('fullscreenchange', () => {
   fullscreenButton.setAttribute('aria-pressed', String(Boolean(document.fullscreenElement)));
+  document.getElementById('mobile-action-fullscreen').setAttribute(
+    'aria-pressed',
+    String(Boolean(document.fullscreenElement))
+  );
 });
 
 searchInput.addEventListener('input', () => {
@@ -1740,5 +2667,6 @@ attributionHistoryToggle.addEventListener('click', () => {
   attributionHistoryToggle.classList.toggle('is-open', !attributionHistoryList.hidden);
 });
 initTheme();
+syncMobileMuseumMode();
 
 initialize();
