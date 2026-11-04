@@ -3550,6 +3550,10 @@ h1 {
     transition: max-height 220ms ease;
   }
 
+  .mobile-detail-sheet.is-dragging {
+    transition: none;
+  }
+
   .mobile-detail-sheet.is-collapsed {
     max-height: 310px;
   }
@@ -3568,6 +3572,17 @@ h1 {
     place-items: center;
     border: 0;
     background: transparent;
+    cursor: grab;
+    touch-action: none;
+    transition: transform 120ms ease;
+  }
+
+  .mobile-sheet-handle:active {
+    cursor: grabbing;
+  }
+
+  .mobile-detail-sheet.is-dragging .mobile-sheet-handle {
+    transition: none;
   }
 
   .mobile-sheet-handle span {

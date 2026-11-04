@@ -218,6 +218,8 @@ let mobileCategoryQuery = '';
 let mobileSearchTimer = null;
 let mobileLoadStatusText = '准备加载';
 let mobileLoadProgress = 0;
+let mobileSheetPointerState = null;
+let suppressMobileSheetClick = false;
 const mobileScrollPositions = new Map();
 const expandedMobileTaxonomyIds = new Set();
 const MOBILE_MUSEUM_QUERY = '(max-width: 1023px)';
@@ -984,12 +986,15 @@ function closeMobileDetail() {
   showMobileView(targetView);
 }
 
-function toggleMobileDetailSheet() {
-  const expanded = mobileDetailSheet.classList.contains('is-collapsed');
+function setMobileDetailSheetExpanded(expanded) {
   mobileDetailSheet.classList.toggle('is-collapsed', !expanded);
   mobileDetailSheet.classList.toggle('is-expanded', expanded);
   mobileDetailArchive.hidden = !expanded;
   mobileSheetToggle.setAttribute('aria-label', expanded ? '收起物种档案' : '展开物种档案');
+}
+
+function toggleMobileDetailSheet() {
+  setMobileDetailSheetExpanded(mobileDetailSheet.classList.contains('is-collapsed'));
 }
 
 function syncMobileMuseumMode({ render = false } = {}) {
@@ -2613,7 +2618,61 @@ document.getElementById('mobile-about-back').addEventListener('click', () => {
 });
 
 document.getElementById('mobile-detail-back').addEventListener('click', closeMobileDetail);
-mobileSheetToggle.addEventListener('click', toggleMobileDetailSheet);
+mobileSheetToggle.addEventListener('pointerdown', (event) => {
+  if (event.pointerType === 'mouse' && event.button !== 0) return;
+  mobileSheetPointerState = {
+    pointerId: event.pointerId,
+    startY: event.clientY,
+    lastY: event.clientY,
+    moved: false
+  };
+  mobileDetailSheet.classList.add('is-dragging');
+  mobileSheetToggle.setPointerCapture?.(event.pointerId);
+});
+
+mobileSheetToggle.addEventListener('pointermove', (event) => {
+  if (!mobileSheetPointerState || event.pointerId !== mobileSheetPointerState.pointerId) return;
+  mobileSheetPointerState.lastY = event.clientY;
+  const delta = event.clientY - mobileSheetPointerState.startY;
+  mobileSheetPointerState.moved ||= Math.abs(delta) > 6;
+  const handleOffset = Math.max(-18, Math.min(18, delta));
+  mobileSheetToggle.style.transform = `translateY(${handleOffset}px)`;
+});
+
+const finishMobileSheetGesture = (event, cancelled = false) => {
+  if (!mobileSheetPointerState || event.pointerId !== mobileSheetPointerState.pointerId) return;
+  const { startY, lastY, moved } = mobileSheetPointerState;
+  mobileSheetPointerState = null;
+  mobileDetailSheet.classList.remove('is-dragging');
+  mobileSheetToggle.style.removeProperty('transform');
+  mobileSheetToggle.releasePointerCapture?.(event.pointerId);
+
+  if (cancelled || !moved) return;
+  const delta = lastY - startY;
+  if (Math.abs(delta) < 32) return;
+
+  suppressMobileSheetClick = true;
+  setMobileDetailSheetExpanded(delta < 0);
+  window.setTimeout(() => {
+    suppressMobileSheetClick = false;
+  }, 0);
+};
+
+mobileSheetToggle.addEventListener('pointerup', (event) => {
+  finishMobileSheetGesture(event);
+});
+
+mobileSheetToggle.addEventListener('pointercancel', (event) => {
+  finishMobileSheetGesture(event, true);
+});
+
+mobileSheetToggle.addEventListener('click', () => {
+  if (suppressMobileSheetClick) {
+    suppressMobileSheetClick = false;
+    return;
+  }
+  toggleMobileDetailSheet();
+});
 
 document.getElementById('mobile-detail-help').addEventListener('click', () => {
   mobileHelpModal.hidden = false;
