@@ -1,4 +1,5 @@
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const fsp = fs.promises;
 const path = require('path');
@@ -394,12 +395,72 @@ function ossObjectUrl(fileName) {
   return `${ossBaseUrl}/${ossObjectKey(fileName).split('/').map(encodeURIComponent).join('/')}`;
 }
 
+function proxiedThumbnailUrl(value) {
+  if (!isAllowedThumbnailUrl(value)) return value;
+  return `/api/thumbnail-proxy?url=${encodeURIComponent(value)}`;
+}
+
+function isAllowedThumbnailUrl(value) {
+  try {
+    const target = new URL(value);
+    return target.protocol === 'https:' &&
+      /^[a-z0-9.-]+\.aliyuncs\.com$/i.test(target.hostname) &&
+      /\.(jpe?g|png|webp)$/i.test(target.pathname);
+  } catch (error) {
+    return false;
+  }
+}
+
+function proxyThumbnail(req, res, sourceUrl) {
+  if (!isAllowedThumbnailUrl(sourceUrl)) {
+    sendJson(res, 400, { error: '缩略图地址无效。' });
+    return;
+  }
+
+  const upstream = https.get(sourceUrl, {
+    headers: {
+      Accept: 'image/avif,image/webp,image/png,image/jpeg'
+    }
+  }, (response) => {
+    const contentType = String(response.headers['content-type'] || '');
+    const contentLength = Number(response.headers['content-length']) || 0;
+    if (response.statusCode !== 200 || !contentType.startsWith('image/')) {
+      response.resume();
+      sendJson(res, 502, { error: '缩略图读取失败。' });
+      return;
+    }
+    if (contentLength > 8 * 1024 * 1024) {
+      response.resume();
+      sendJson(res, 413, { error: '缩略图文件过大。' });
+      return;
+    }
+
+    res.writeHead(200, {
+      'Content-Type': contentType,
+      'Content-Length': contentLength || undefined,
+      'Cache-Control': 'public, max-age=86400',
+      'Access-Control-Allow-Origin': '*',
+      'Cross-Origin-Resource-Policy': 'cross-origin'
+    });
+    response.pipe(res);
+  });
+
+  upstream.setTimeout(15000, () => {
+    upstream.destroy(new Error('缩略图请求超时。'));
+  });
+  upstream.on('error', (error) => {
+    console.error(error);
+    if (!res.headersSent) sendJson(res, 502, { error: '缩略图读取失败。' });
+    else res.end();
+  });
+}
+
 function modelThumbnailUrl(model) {
-  if (model.thumbnail) return model.thumbnail;
-  if (model.thumbnailUrl) return model.thumbnailUrl;
+  if (model.thumbnail) return proxiedThumbnailUrl(model.thumbnail);
+  if (model.thumbnailUrl) return proxiedThumbnailUrl(model.thumbnailUrl);
   if (model.thumbnailFileName) {
     if (model.thumbnailStorage === 'oss') {
-      return ossObjectUrl(model.thumbnailFileName);
+      return proxiedThumbnailUrl(ossObjectUrl(model.thumbnailFileName));
     }
     return `/thumbs/${encodeURIComponent(model.thumbnailFileName)}`;
   }
@@ -1463,6 +1524,11 @@ async function handleApi(req, res, url) {
     return true;
   }
 
+  if (url.pathname === '/api/thumbnail-proxy' && req.method === 'GET') {
+    proxyThumbnail(req, res, url.searchParams.get('url') || '');
+    return true;
+  }
+
   if (url.pathname === '/api/search' && req.method === 'GET') {
     const query = (url.searchParams.get('q') || '').trim().toLocaleLowerCase('zh-CN');
     if (!query) {
@@ -1636,8 +1702,6 @@ function sendFile(req, res, filePath) {
   const range = req.headers.range;
 
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
   res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
   res.setHeader('Accept-Ranges', 'bytes');
   res.setHeader('Cache-Control', 'no-cache');

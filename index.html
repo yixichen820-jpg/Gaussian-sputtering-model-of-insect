@@ -221,14 +221,14 @@
       </main>
     </section>
 
-    <section class="mobile-museum" id="mobile-museum" aria-label="昆虫数字自然博物馆">
+    <section class="mobile-museum" id="mobile-museum" aria-label="昆虫高斯溅射模型展示">
       <div class="mobile-view" id="mobile-home-view" data-mobile-view="home">
         <header class="mobile-home-header">
           <button class="mobile-brand" id="mobile-home-brand" type="button">
             <span class="mobile-brand-mark"><i data-lucide="leaf"></i></span>
             <span>
-              <strong>昆虫数字自然博物馆</strong>
-              <small>INSECT DIGITAL MUSEUM</small>
+              <strong>昆虫高斯溅射模型展示</strong>
+              <small>GAUSSIAN SPLAT VIEWER</small>
             </span>
           </button>
           <button class="mobile-round-button" id="mobile-home-about" type="button" aria-label="查看博物馆介绍">
@@ -279,32 +279,21 @@
             <div class="mobile-featured-list" id="mobile-featured-list"></div>
           </section>
 
-          <section class="mobile-section">
+          <section class="mobile-section mobile-identified-section" id="mobile-identified-section">
             <div class="mobile-section-head">
               <div>
-                <span class="mobile-eyebrow">CATALOGUE PREVIEW</span>
-                <h2>馆藏目录</h2>
+                <span class="mobile-eyebrow">IDENTIFIED COLLECTION</span>
+                <h2>已鉴定馆藏</h2>
               </div>
-              <span class="mobile-section-count" id="mobile-home-model-count"></span>
+              <span class="mobile-identified-count" id="mobile-identified-count">0 件</span>
             </div>
-            <div class="mobile-catalog-preview" id="mobile-catalog-preview"></div>
-          </section>
-
-          <section class="mobile-section mobile-progress-section" id="mobile-progress-section">
-            <div class="mobile-section-head">
-              <div>
-                <span class="mobile-eyebrow">IN PREPARATION</span>
-                <h2>制作中的馆藏</h2>
-              </div>
-              <span class="mobile-progress-count" id="mobile-progress-count">5 项</span>
-            </div>
-            <p>新标本正在采集、重建与数字化整理中，完成后会进入正式馆藏。</p>
-            <div class="mobile-progress-list" id="mobile-progress-list"></div>
+            <p>以下馆藏已经录入物种介绍，可结合三维形态与档案资料一同查看。</p>
+            <div class="mobile-identified-list" id="mobile-identified-list"></div>
           </section>
 
           <details class="mobile-about-card" id="mobile-home-about-details">
             <summary>
-              <span><i data-lucide="info"></i> 关于数字自然博物馆</span>
+              <span><i data-lucide="info"></i> 关于昆虫高斯溅射模型展示</span>
               <i data-lucide="chevron-down"></i>
             </summary>
             <p>这里以昆虫三维形态观察和物种档案为核心，让自然史收藏更易检索、更容易被理解。</p>
@@ -373,13 +362,13 @@
           <div class="mobile-category-heading">
             <div>
               <span class="mobile-eyebrow">BROWSE THE COLLECTION</span>
-              <h1 id="mobile-category-title">目级分类</h1>
+              <h1 id="mobile-category-title">分类树</h1>
             </div>
             <span id="mobile-category-count"></span>
           </div>
           <label class="mobile-search-form mobile-category-search">
             <i data-lucide="search"></i>
-            <input id="mobile-category-search" type="search" placeholder="搜索当前分类" autocomplete="off" />
+            <input id="mobile-category-search" type="search" placeholder="搜索完整分类树" autocomplete="off" />
           </label>
           <div class="mobile-taxonomy-list" id="mobile-taxonomy-list"></div>
           <div class="mobile-category-action">
@@ -408,16 +397,12 @@
           </section>
           <section class="mobile-about-stats" id="mobile-about-stats"></section>
           <section class="mobile-about-section">
-            <h2>我们如何组织馆藏</h2>
-            <p>正式馆藏用于浏览已完成的三维模型；制作中的内容单独展示，不被标记为可观察馆藏。</p>
-          </section>
-          <section class="mobile-about-section">
             <h2>观察方式</h2>
             <p>进入模型后，单指旋转，双指缩放和平移。复位、自动旋转和全屏操作都位于底部工具区。</p>
           </section>
           <section class="mobile-about-section">
-            <h2>项目说明</h2>
-            <p>模型文件由 OSS 独立管理，网页代码与三维资源分开维护，便于后续持续补充馆藏。</p>
+            <h2>网站介绍</h2>
+            <p>昆虫高斯溅射模型展示以昆虫三维形态观察和物种资料浏览为核心。你可以按名称、学名或分类查找馆藏，并在旋转、缩放和全屏观察中认识不同昆虫的形态特征。</p>
           </section>
           <footer class="mobile-home-footer">
             <a href="/admin.html">管理界面</a>
@@ -456,6 +441,7 @@
           </button>
         </header>
         <div class="mobile-detail-status" id="mobile-detail-status">准备加载</div>
+        <button class="mobile-detail-retry" id="mobile-detail-retry" type="button" hidden>重新加载模型</button>
         <section class="mobile-detail-sheet is-collapsed" id="mobile-detail-sheet">
           <button class="mobile-sheet-handle" id="mobile-sheet-toggle" type="button" aria-label="展开物种档案">
             <span></span>
@@ -470,6 +456,10 @@
             </div>
             <div class="mobile-detail-tags" id="mobile-detail-tags"></div>
           </div>
+          <section class="mobile-detail-intro">
+            <h2>物种介绍</h2>
+            <p id="mobile-detail-intro"></p>
+          </section>
           <div class="mobile-detail-tools">
             <button id="mobile-action-rotate" type="button" aria-pressed="true"><i data-lucide="rotate-cw"></i><span>旋转</span></button>
             <button id="mobile-action-zoom" type="button"><i data-lucide="zoom-in"></i><span>缩放</span></button>
@@ -477,10 +467,6 @@
             <button id="mobile-action-fullscreen" type="button"><i data-lucide="maximize"></i><span>全屏</span></button>
           </div>
           <div class="mobile-detail-archive" id="mobile-detail-archive" hidden>
-            <section>
-              <h2>物种档案</h2>
-              <p id="mobile-detail-intro"></p>
-            </section>
             <section>
               <h2>分类路径</h2>
               <p id="mobile-detail-taxonomy"></p>
