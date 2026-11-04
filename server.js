@@ -22,7 +22,11 @@ const dataDir = path.join(rootDir, 'data');
 const manifestPath = path.join(dataDir, 'models.json');
 const taxonomyPath = path.join(dataDir, 'taxonomy.json');
 const port = Number(process.env.PORT || 4173);
-const adminKey = process.env.ADMIN_KEY || 'Logenshinve';
+const adminKey = process.env.ADMIN_KEY || '';
+if (!adminKey || adminKey === 'Logenshinve') {
+  console.error('ADMIN_KEY 未配置或仍使用公开示例值，服务器拒绝启动。');
+  process.exit(1);
+}
 
 const ossRegion = process.env.OSS_REGION || '';
 const ossBucket = process.env.OSS_BUCKET || '';

@@ -14,6 +14,8 @@ $items = @(
   'admin.css',
   'main.js',
   'style.css',
+  'museum-ui.json',
+  'changelog.html',
   'ecosystem.config.cjs',
   'nginx.conf',
   '.env.example',
